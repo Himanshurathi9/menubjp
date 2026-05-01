@@ -128,8 +128,9 @@ function StampEarnedPopup({
 
   // Lock body scroll when popup is open
   useEffect(() => {
+    const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
+    return () => { document.body.style.overflow = prev || '' }
   }, [])
 
   // Close on Escape

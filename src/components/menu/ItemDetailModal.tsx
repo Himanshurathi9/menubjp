@@ -52,12 +52,9 @@ export default function ItemDetailModal({
   // Prevent body scroll when open
   useEffect(() => {
     if (isOpen) {
+      const prev = document.body.style.overflow
       document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
+      return () => { document.body.style.overflow = prev || '' }
     }
   }, [isOpen])
 

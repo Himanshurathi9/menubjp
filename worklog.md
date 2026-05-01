@@ -127,3 +127,31 @@ Stage Summary:
 - Cart sheet and service bar properly sized on small screens
 - Login left panel correctly hidden on mobile
 - Design, colors, and UI structure unchanged — only layout/responsiveness fixes
+
+---
+
+Task ID: 4
+Agent: Main Agent
+Task: Fix ALL interaction bugs — page not scrollable, buttons not clickable, UI frozen/blocked
+
+Work Log:
+- Performed comprehensive audit of all CSS files, components, and pages for scroll-blocking, pointer-events, z-index, and overlay issues
+- **ROOT CAUSE #1 FOUND**: `html { height: 100%; }` and `@supports { html { height: 100dvh; } }` in `src/styles/design-system.css` (lines 143-150) — This set a FIXED height on the HTML element equal to the viewport, preventing any content below the viewport from being scrollable. This was THE primary cause of the "page not scrollable" and "UI feels frozen" bugs.
+- **ROOT CAUSE #2 FOUND**: Missing `overflow-y: auto` on both `html` and `body` in `globals.css` — Without explicitly ensuring vertical scroll is enabled, some browser configurations would not allow scrolling.
+- **FIX #1**: Changed `html { height: 100%; }` → `html { min-height: 100%; }` and `html { height: 100dvh; }` → `html { min-height: 100dvh; }` in design-system.css — This allows the HTML element to grow beyond the viewport while still ensuring full-viewport minimum height.
+- **FIX #2**: Added `overflow-y: auto` to `html` rule in both globals.css and design-system.css
+- **FIX #3**: Added `overflow-y: auto` to `body` rule in globals.css
+- **FIX #4**: Improved body scroll lock pattern in CartSheet.tsx — Changed from blindly setting/clearing `document.body.style.overflow` to saving the previous value and restoring it on cleanup. This prevents scroll lock from persisting if the component unmounts unexpectedly.
+- **FIX #5**: Same body scroll lock improvement in ItemDetailModal.tsx
+- **FIX #6**: Same body scroll lock improvement in PublicMenuClient.tsx (fullscreen image viewer)
+- **FIX #7**: Same body scroll lock improvement in OrderTrackClient.tsx
+- Verified no invisible overlays blocking clicks (mesh orbs have `pointer-events: none` ✓, confetti has `pointer-events: none` ✓, service button ripple has `pointer-events: none` ✓)
+- Verified no `pointer-events: none` on interactive elements
+- Verified no z-index issues with interactive elements
+- Tested with agent-browser: Landing page loads, all interactive elements visible and clickable, scrolling works
+
+Stage Summary:
+- **CRITICAL FIX**: `html { height: 100% }` → `min-height: 100%` — This was the root cause of ALL interaction bugs
+- All 4 body scroll lock patterns improved to save/restore previous overflow value
+- No design, color, layout, or structural changes made — only interaction fixes
+- All pages compile and serve without errors

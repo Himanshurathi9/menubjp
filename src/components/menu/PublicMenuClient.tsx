@@ -422,8 +422,9 @@ export default function PublicMenuClient({
     if (!fullscreenImg) return
     const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') setFullscreenImg(null) }
     document.addEventListener('keydown', fn)
+    const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    return () => { document.removeEventListener('keydown', fn); document.body.style.overflow = '' }
+    return () => { document.removeEventListener('keydown', fn); document.body.style.overflow = prev || '' }
   }, [fullscreenImg])
 
   // ─── Reset to All when search cleared ───────────────────────
