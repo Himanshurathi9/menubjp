@@ -47,7 +47,7 @@ function MiniConfetti({ count = 20, colors }: { count?: number; colors?: string[
   const palette = colors || defaultColors
 
   return (
-    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 100, overflow: 'hidden' }}>
+    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 100, clipPath: 'inset(0)' }}>
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}

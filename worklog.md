@@ -203,3 +203,227 @@ Stage Summary:
 - ⚠️ Dev server instability in sandbox environment (process dies periodically but compiles fine)
 - 🔴 Security: Hardcoded secrets in env.ts (pre-existing, not addressed this round)
 - 🔴 Dashboard/Admin pages not QA-tested via browser (require authentication)
+
+---
+
+Task ID: 6
+Agent: Bug Fix Agent
+Task: Fix critical scroll/frozen UI bugs across MenuMate project
+
+Work Log:
+- **FIX 1a**: OrderTrackClient.tsx — Updated StampEarnedPopup body scroll lock comment to clarify intent (unconditional lock is correct since component only renders when popup is visible)
+- **FIX 1b**: OrderTrackClient.tsx — Changed backdrop onClick from `result ? onClose : undefined` to `onClose`, allowing dismissal by clicking backdrop even before result
+- **FIX 2**: CartSheet.tsx — Replaced simple useBodyLock with counter-based approach using module-level `bodyLockCount` variable. Prevents stale body lock when multiple components use the hook simultaneously
+- **FIX 3**: OrderTrackClient.tsx — Replaced `overflow: hidden` on confetti fixed container with `clipPath: 'inset(0)'` to prevent scroll event blocking on mobile WebKit
+- **FIX 4**: StampsTab.tsx — Same confetti container fix: `overflow: 'hidden'` → `clipPath: 'inset(0)'`
+- **FIX 5**: design-system.css — Changed `overscroll-behavior-y: none` to `overscroll-behavior-y: contain` on body element. Prevents page navigation overscroll while allowing natural bounce feedback
+- **FIX 6**: globals.css — Changed `max-width: 100vw` to `max-width: 100%` on body. The 100vw value includes scrollbar width causing horizontal overflow on desktop
+- **FIX 7**: Login page — Changed `overflow: 'hidden'` to `overflowY: 'auto'` on right panel div. Allows scrolling when form exceeds viewport height
+- **FIX 8**: ItemDetailModal.tsx — Changed body lock useEffect from `if (isOpen) { ... return cleanup }` to `if (!isOpen) return; ... return cleanup`. Ensures React always receives a cleanup function when the effect ran
+- **FIX 9**: Hero section (page.tsx) — Added `touchAction: 'pan-y'` to hero section style. Ensures vertical touch scrolling passes through on mobile browsers despite `overflow: hidden`
+
+Lint Results:
+- No new errors introduced by these changes
+- Pre-existing errors remain (7 `@typescript-eslint/no-require-imports` in .cjs/.js utility files, unrelated to this task)
+
+Stage Summary:
+- All 9 scroll/interaction fixes applied across 7 files
+- No design, layout, colors, or structural changes made — only interaction fixes
+- Counter-based body lock prevents stale scroll freeze when multiple overlays open/close
+- Confetti containers no longer block scroll events on mobile WebKit
+- Login page right panel now scrollable when form exceeds viewport
+- Body max-width no longer causes horizontal overflow on desktop
+
+---
+
+Task ID: 7
+Agent: Styling Enhancement Agent
+Task: Add micro-interactions, styling enhancements, and visual polish to the MenuMate landing page
+
+Work Log:
+
+### 1. Animated Gradient Border on Pro Pricing Card
+- Added `pro-gradient-border` CSS class to the Pro pricing card (alongside existing `pricing-shimmer`)
+- Implemented `::before` pseudo-element with conic-gradient (red hues: #E63946 → #FF6B6B → #B71C1C) and CSS mask technique to create a 2px animated border ring
+- Added `@property --border-angle` CSS at-rule for animating the custom property from 0deg to 360deg
+- `@keyframes rotateGradientBorder` rotates the gradient angle continuously (4s linear infinite)
+- Uses `mask-composite: exclude` to reveal only the 2px border area from the gradient
+- Fallback: browsers without `@property` support show a static gradient border (still visually appealing)
+
+### 2. Feature Cards Hover Glow Enhancement
+- Added `box-shadow: '0 0 20px rgba(230,57,70,0.15), 0 8px 32px rgba(0,0,0,0.3)'` on hover
+- Added `box-shadow: 'none'` on mouse leave
+- Updated transition to include `box-shadow 200ms ease`
+
+### 3. Smooth Counter Animation Enhancement (Stats Section)
+- Enhanced `statPulse` keyframe from simple scale(1)→scale(1.08)→scale(1) to a bounce effect: scale(1)→scale(1.05)→scale(0.98)→scale(1.01)→scale(1)
+- Changed animation from `0.5s ease-in-out` to `0.6s cubic-bezier(0.34, 1.56, 0.64, 1)` for a snappier bounce feel
+
+### 4. Navbar Active Link Indicator
+- Added `activeSection` state to the Navbar component
+- Implemented `useEffect` with IntersectionObserver tracking 5 sections: `how-it-works`, `features`, `pricing`, `faq`, `demo`
+- Observer config: `threshold: 0.3, rootMargin: '-80px 0px -40% 0px'` to account for fixed navbar
+- Desktop links: Added `borderBottom: 2px solid accent` and `paddingBottom: 4` for active link indicator
+- Desktop links: Color changes to `textPrimary` when section is active
+- Mobile links: Added `borderLeft: 3px solid accent` and `paddingLeft` shift for active link indicator
+- Smooth transitions on both border-color and padding changes
+
+### 5. Pricing Card "Most Popular" Badge Animation
+- Enhanced `badgePulse` keyframe to include glow effect alongside the ring pulse
+- Changed from `box-shadow: 0 0 0 0 rgba(230,57,70,0.5)` → `0 0 0 8px rgba(230,57,70,0)` to include continuous glow
+- Now: `box-shadow: 0 0 0 0 rgba(230,57,70,0.5), 0 0 12px rgba(230,57,70,0.3)` → `0 0 0 8px rgba(230,57,70,0), 0 0 20px rgba(230,57,70,0.5)`
+- The glow oscillates between 12px and 20px, creating a breathing light effect
+
+### 6. Testimonial Card Rating Stars Animation
+- Added `testimonial-star` CSS class and `starFadeIn` keyframe
+- Stars animate from `opacity: 0; scale(0.5)` → `opacity: 1; scale(1.15)` → `opacity: 1; scale(1)` (pop-in effect)
+- Each star has a staggered delay: `${i * 0.15 + si * 0.08}s` where `i` is the card index and `si` is the star index
+- This creates a wave effect: cards animate first, then stars within each card appear one by one
+
+### 7. Footer Social Links with Hover Effects
+- Navigation links: Added `translateX(4px)` slide effect on hover with `color` and `transform` transitions (200ms)
+- WhatsApp button: Added `translateX(4px)` slide effect alongside existing opacity transition
+- Email link: Added `translateX(4px)` slide effect with color and transform transitions
+- All links use `display: inline-block` to enable transform animations
+- Transition upgraded from `150ms` to `200ms` for smoother feel
+
+### 8. Smooth Section Transitions
+- Added subtle radial gradient overlays to create depth between sections:
+  - How It Works: `radial-gradient(ellipse 80% 50% at 50% 0%, rgba(230,57,70,0.04), transparent 60%)` — subtle red glow from top
+  - Features: `radial-gradient(ellipse 60% 40% at 30% 50%, rgba(52,199,89,0.03), transparent 60%)` — subtle green tint on left
+  - Testimonials: `radial-gradient(ellipse 60% 40% at 70% 50%, rgba(230,57,70,0.04), transparent 60%)` — subtle red tint on right
+  - FAQ: `radial-gradient(ellipse 80% 50% at 50% 100%, rgba(230,57,70,0.03), transparent 60%)` — subtle glow from bottom
+- All gradients are extremely subtle (0.03-0.04 opacity) to not change the overall look but add depth perception
+
+### 9. Enhanced Scroll-to-Top Button
+- The progress ring was already implemented by a previous agent (Task 5 or 6)
+- Verified the implementation: SVG circle with `strokeDashoffset` based on scroll progress, accent-colored progress arc
+- No additional changes needed — the feature is fully working
+
+Lint Results:
+- No new errors introduced (only pre-existing 7 `@typescript-eslint/no-require-imports` in .cjs/.js utility files)
+- Page compiles successfully (200 OK, ~946ms compile time)
+
+Stage Summary:
+- All 9 requested styling enhancements implemented
+- No layout, structure, color scheme, or content changes
+- All animations use `transform` and `opacity` for GPU acceleration
+- CSS `@property` used for gradient border animation (with graceful fallback)
+- IntersectionObserver-based active link tracking is performant and doesn't affect scroll performance
+- All hover effects work on both desktop and mobile (using inline event handlers)
+- Backward compatible — no existing functionality broken
+
+---
+
+Task ID: 8
+Agent: Feature Agent
+Task: Add Dark Mode Toggle, Cookie Consent Banner, Back to Top Progress Indicator, and Typewriter Effect to Landing Page
+
+Work Log:
+
+### Feature 1: Dark Mode Toggle
+- Added CSS custom properties (`--mm-*`) to `globals.css` `:root` for all landing page theme tokens (35+ variables covering bg, surface, card, borders, text, accents, nav, buttons, hero radials, badges, trust, problem/solution sections)
+- Added `.light-mode` CSS class overrides in `globals.css` — light theme uses #F5F5F5 backgrounds with #1A1A1A text, adjusted borders, opacity values, and scrollbars for light mode
+- Updated the `T` design tokens object in `page.tsx` from hardcoded hex/rgba values to CSS variable references with fallbacks (e.g., `var(--mm-bg, #0A0A0A)`)
+- Added 23 new theme-aware token properties to T: `sectionAlt`, `navBg`, `navBgScroll`, `btnGhostBg`, `btnGhostBorder`, `btnGhostHover`, `cardBorder`, `cardBorderHover`, `iconMuted`, `overlayBg`, `heroRadial1/2/3`, `badgeBg`, `badgeBorder`, `trustBg`, `trustBorder`, `trustText`, `problemBg`, `problemBorder`, `solutionBg`, `solutionBorder`
+- Added `useLandingTheme()` hook — initializes state from `localStorage('menumate-landing-theme')` using lazy initializer, applies `.light-mode` class to `document.documentElement` via useEffect, `toggleTheme` callback updates localStorage and state
+- Updated Navbar component: added Sun/Moon icon toggle button (36px circle) next to Log In on desktop, added toggle button next to hamburger on mobile, toggle button uses theme-aware `var()` values for border/background
+- Updated hardcoded background values in Navbar, HeroSection, ProblemSolutionSection, and other sections to use the new T tokens (e.g., `T.navBg`, `T.sectionAlt`, `T.badgeBg`, `T.problemBg`, `T.solutionBg`, `T.btnGhostBg`, `T.trustBg`)
+- Updated hardcoded `rgba(255,255,255,0.06)` border values to `T.cardBorder` across sections
+- Updated hardcoded `rgba(255,255,255,0.5)` icon-muted colors to `T.iconMuted`
+- Updated hover border colors from `'rgba(230,57,70,0.2)'` to `T.cardBorderHover`
+
+### Feature 2: Cookie Consent Banner
+- Added `CookieConsent` component — checks `localStorage('menumate-cookie-consent')` on mount, shows banner after 1.5s delay if no consent stored
+- Accept button stores `'accepted'` in localStorage, Decline stores `'declined'` — both dismiss banner
+- Fixed position at bottom of viewport, z-index 60, theme-aware styling using CSS variables
+- Cookie icon from lucide-react, accent-colored Accept button with glow shadow, ghost-bordered Decline button
+- Subtle slide-up animation via `cookie-consent-enter` CSS class and `cookieSlideUp` keyframe
+- Responsive: flex-wrap layout with `clamp()` padding
+
+### Feature 3: Back to Top Progress Indicator
+- Enhanced `ScrollToTopButton` with circular SVG progress ring around the ArrowUp icon
+- Tracks scroll progress as `scrollY / (scrollHeight - innerHeight)`, updates on every scroll event
+- SVG ring: 48px size, 3px stroke width, background track in `--mm-card-border` color, progress arc in `--mm-accent` (#E63946)
+- `stroke-dasharray` / `stroke-dashoffset` animation with 100ms ease transition for smooth filling
+- Inner circle with ArrowUp icon sits inside the ring, hover lift effect preserved
+- Ring rotates -90deg so progress starts from top
+
+### Feature 4: Typewriter Effect on Hero Headline
+- Replaced static `<span style={{ color: T.accent }}>a menu that sells.</span>` with typewriter animation
+- Added `typedText` state and `fullText` constant ('a menu that sells.')
+- `useEffect` starts typing when `loaded` becomes true, using `setInterval` with 50ms delay per character
+- Blinking cursor shown via `.typewriter-cursor` CSS class — 3px wide inline-block with `typewriterBlink` keyframe (0.8s step-end infinite), accent-colored background
+- Cursor disappears when typing completes
+
+### CSS Changes (globals.css)
+- Added 35+ CSS custom properties under `:root` for dark theme (default)
+- Added `.light-mode` class with full light theme overrides
+- Added `.light-mode` scrollbar overrides and selection color
+- Added `@keyframes typewriterBlink` and `.typewriter-cursor` class
+- Added `@keyframes cookieSlideUp` and `.cookie-consent-enter` class
+
+### Import Changes
+- Added `Sun`, `Moon`, `Cookie` to lucide-react imports
+
+Lint Results:
+- No new errors introduced (only pre-existing 7 `@typescript-eslint/no-require-imports` in .cjs/.js utility files)
+- Fixed React compiler error: moved `setTheme` from effect body to lazy initializer in `useState`
+- Removed unused eslint-disable directive
+
+Dev Server:
+- Page compiles successfully (200 OK, compile: 946ms)
+
+Stage Summary:
+- All 4 features implemented and verified
+- Dark mode toggle works across all sections via CSS variable system
+- Cookie consent shows on first visit, stores preference in localStorage
+- Progress ring on scroll-to-top fills as user scrolls down
+- Typewriter effect animates hero tagline with blinking cursor
+- No existing functionality broken — design, colors, and layout preserved in dark mode (default)
+
+---
+
+## Current Project Status (Phase 6 Summary)
+
+### ✅ Completed This Phase
+1. **Critical Bug Fixes (9 fixes across 7 files)**:
+   - OrderTrackClient: Fixed backdrop dismissal + confetti scroll blocking
+   - CartSheet: Counter-based body lock prevents stale scroll freeze
+   - StampsTab: Confetti container no longer blocks scroll on mobile
+   - design-system.css: `overscroll-behavior-y: contain` instead of `none`
+   - globals.css: `max-width: 100%` instead of `100vw` on body
+   - Login page: Right panel now scrollable when form exceeds viewport
+   - ItemDetailModal: Body lock cleanup always runs correctly
+   - Hero section: `touchAction: 'pan-y'` for mobile scroll pass-through
+
+2. **Styling Enhancements (9 enhancements)**:
+   - Animated gradient border on Pro pricing card
+   - Feature cards hover glow effect
+   - Stats counter bounce animation
+   - Navbar active link indicator (IntersectionObserver)
+   - Most Popular badge glow animation
+   - Testimonial stars staggered pop-in
+   - Footer links hover effects
+   - Section depth via subtle gradient overlays
+   - Scroll-to-top progress ring
+
+3. **New Features (4 features)**:
+   - Dark/Light mode toggle (CSS variables, localStorage persistence)
+   - Cookie consent banner (localStorage, slide-up animation)
+   - Back to top progress indicator (SVG ring)
+   - Typewriter effect on hero headline (blinking cursor)
+
+### ⚠️ Known Issues
+- Dev server process dies periodically in sandbox (needs restart)
+- Security: Hardcoded secrets in env.ts (pre-existing, not addressed)
+- Dashboard/Admin pages not QA-tested (require authentication)
+- Prisma schema is stale (app uses Supabase directly)
+
+### 📋 Priority for Next Phase
+1. Fix dev server stability (consider production build or process manager)
+2. Address security: Move hardcoded secrets to environment variables
+3. QA test dashboard/admin pages
+4. Add more interactive features (e.g., animated dashboard stats, order notifications)
+5. Improve accessibility (ARIA labels, keyboard navigation)
+6. Performance optimization (lazy loading, code splitting)

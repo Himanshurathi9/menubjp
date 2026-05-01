@@ -76,7 +76,7 @@ function Confetti() {
   }, [])
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[100] overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none z-[100]" style={{ clipPath: 'inset(0)' }}>
       {pieces.map((p) => (
         <div
           key={p.id}
@@ -128,6 +128,7 @@ function StampEarnedPopup({
 
   // Lock body scroll when popup is open
   useEffect(() => {
+    // Always lock since this component only renders when popup is visible
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = prev || '' }
@@ -211,7 +212,7 @@ function StampEarnedPopup({
           zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
           animation: 'stamp-backdrop-in 0.3s ease',
         }}
-        onClick={result ? onClose : undefined}
+        onClick={onClose}
       >
         <style>{`
           @keyframes stamp-backdrop-in {

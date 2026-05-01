@@ -230,7 +230,7 @@ export default function LoginPage() {
           minHeight: '100dvh',
           boxSizing: 'border-box',
           position: 'relative',
-          overflow: 'hidden',
+          overflowY: 'auto',
         }}
       >
         {/* ── Animated background particles ── */}

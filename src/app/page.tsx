@@ -21,6 +21,9 @@ import {
   Image as ImageIcon,
   ClipboardList,
   ArrowUp,
+  Sun,
+  Moon,
+  Cookie,
 } from 'lucide-react'
 
 /* ── WhatsApp helper (uses env.ts — NO hardcoded numbers) ── */
@@ -28,20 +31,42 @@ import { env } from '@/lib/env'
 const waLink = (msg: string) =>
   `https://wa.me/${env.WHATSAPP_CONTACT_NUMBER}?text=${encodeURIComponent(msg)}`
 
-/* ── Design tokens ── */
+/* ── Design tokens (CSS variable-backed for theme switching) ── */
 const T = {
-  bg: '#0A0A0A',
-  surface: '#111111',
-  card: '#1A1A1A',
-  border: 'rgba(255,255,255,0.08)',
-  borderHover: 'rgba(230,57,70,0.3)',
-  textPrimary: '#FFFFFF',
-  textSecondary: 'rgba(255,255,255,0.6)',
-  textMuted: 'rgba(255,255,255,0.35)',
-  accent: '#E63946',
-  accentGlow: 'rgba(230,57,70,0.15)',
-  green: '#34C759',
-  waGreen: '#25D366',
+  bg: 'var(--mm-bg, #0A0A0A)',
+  surface: 'var(--mm-surface, #111111)',
+  card: 'var(--mm-card, #1A1A1A)',
+  border: 'var(--mm-border, rgba(255,255,255,0.08))',
+  borderHover: 'var(--mm-border-hover, rgba(230,57,70,0.3))',
+  textPrimary: 'var(--mm-text-primary, #FFFFFF)',
+  textSecondary: 'var(--mm-text-secondary, rgba(255,255,255,0.6))',
+  textMuted: 'var(--mm-text-muted, rgba(255,255,255,0.35))',
+  accent: 'var(--mm-accent, #E63946)',
+  accentGlow: 'var(--mm-accent-glow, rgba(230,57,70,0.15))',
+  green: 'var(--mm-green, #34C759)',
+  waGreen: 'var(--mm-wa-green, #25D366)',
+  sectionAlt: 'var(--mm-section-alt, #0D0D0D)',
+  navBg: 'var(--mm-nav-bg, rgba(10,10,10,0.8))',
+  navBgScroll: 'var(--mm-nav-bg-scroll, rgba(10,10,10,0.95))',
+  btnGhostBg: 'var(--mm-btn-ghost-bg, rgba(255,255,255,0.06))',
+  btnGhostBorder: 'var(--mm-btn-ghost-border, rgba(255,255,255,0.12))',
+  btnGhostHover: 'var(--mm-btn-ghost-hover, rgba(255,255,255,0.1))',
+  cardBorder: 'var(--mm-card-border, rgba(255,255,255,0.06))',
+  cardBorderHover: 'var(--mm-card-border-hover, rgba(230,57,70,0.2))',
+  iconMuted: 'var(--mm-icon-muted, rgba(255,255,255,0.5))',
+  overlayBg: 'var(--mm-overlay-bg, rgba(10,10,10,0.98))',
+  heroRadial1: 'var(--mm-hero-radial1, rgba(230,57,70,0.15))',
+  heroRadial2: 'var(--mm-hero-radial2, rgba(230,57,70,0.08))',
+  heroRadial3: 'var(--mm-hero-radial3, rgba(52,199,89,0.05))',
+  badgeBg: 'var(--mm-badge-bg, rgba(230,57,70,0.1))',
+  badgeBorder: 'var(--mm-badge-border, rgba(230,57,70,0.3))',
+  trustBg: 'var(--mm-trust-bg, rgba(255,255,255,0.04))',
+  trustBorder: 'var(--mm-trust-border, rgba(255,255,255,0.06))',
+  trustText: 'var(--mm-trust-text, rgba(255,255,255,0.4))',
+  problemBg: 'var(--mm-problem-bg, rgba(255,59,48,0.05))',
+  problemBorder: 'var(--mm-problem-border, rgba(255,59,48,0.15))',
+  solutionBg: 'var(--mm-solution-bg, rgba(52,199,89,0.05))',
+  solutionBorder: 'var(--mm-solution-border, rgba(52,199,89,0.15))',
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -112,6 +137,28 @@ function useScrollDirection() {
   return { dir, scrollY }
 }
 
+function useLandingTheme() {
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window === 'undefined') return 'dark'
+    const stored = localStorage.getItem('menumate-landing-theme')
+    return stored === 'light' ? 'light' : 'dark'
+  })
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('light-mode', theme === 'light')
+  }, [theme])
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark'
+      localStorage.setItem('menumate-landing-theme', next)
+      return next
+    })
+  }, [])
+
+  return { theme, toggleTheme }
+}
+
 /* ═══════════════════════════════════════════════════════════
    ANIMATED SECTION WRAPPER
    ═══════════════════════════════════════════════════════════ */
@@ -165,7 +212,28 @@ function SectionLabel({ text }: { text: string }) {
 function Navbar() {
   const { dir, scrollY } = useScrollDirection()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { theme, toggleTheme } = useLandingTheme()
+  const [activeSection, setActiveSection] = useState('')
   const hidden = dir === 'down' && scrollY > 200
+
+  // Track which section is currently in view for active link indicator
+  useEffect(() => {
+    const sectionIds = ['how-it-works', 'features', 'pricing', 'faq', 'demo']
+    const observers: IntersectionObserver[] = []
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id)
+      if (!el) return
+      const obs = new IntersectionObserver(
+        ([e]) => {
+          if (e.isIntersecting) setActiveSection(id)
+        },
+        { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' },
+      )
+      obs.observe(el)
+      observers.push(obs)
+    })
+    return () => observers.forEach((o) => o.disconnect())
+  }, [])
 
   const links = [
     { label: 'How it Works', href: '#how-it-works' },
@@ -185,10 +253,10 @@ function Navbar() {
           right: 0,
           zIndex: 100,
           height: 64,
-          background: scrollY > 50 ? 'rgba(10,10,10,0.95)' : 'rgba(10,10,10,0.8)',
+          background: scrollY > 50 ? T.navBgScroll : T.navBg,
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          borderBottom: '1px solid var(--mm-card-border, rgba(255,255,255,0.06))',
           boxShadow: scrollY > 50 ? '0 4px 20px rgba(0,0,0,0.3)' : 'none',
           padding: '0 clamp(16px, 5vw, 40px)',
           transition: 'top 0.3s ease, background 0.3s ease, box-shadow 0.3s ease',
@@ -221,26 +289,56 @@ function Navbar() {
 
           {/* Desktop links */}
           <div className="hidden md:flex" style={{ alignItems: 'center', gap: 32 }}>
-            {links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                style={{
-                  fontSize: 14,
-                  color: T.textSecondary,
-                  textDecoration: 'none',
-                  transition: 'color 150ms',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = T.textPrimary)}
-                onMouseLeave={(e) => (e.currentTarget.style.color = T.textSecondary)}
-              >
-                {l.label}
-              </a>
-            ))}
+            {links.map((l) => {
+              const isActive = activeSection === l.href.replace('#', '')
+              return (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  style={{
+                    fontSize: 14,
+                    color: isActive ? T.textPrimary : T.textSecondary,
+                    textDecoration: 'none',
+                    transition: 'color 150ms, border-color 200ms ease',
+                    borderBottom: `2px solid ${isActive ? T.accent : 'transparent'}`,
+                    paddingBottom: 4,
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = T.textPrimary)}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = isActive ? T.textPrimary : T.textSecondary)}
+                >
+                  {l.label}
+                </a>
+              )
+            })}
           </div>
 
           {/* Desktop CTAs */}
           <div className="hidden md:flex" style={{ alignItems: 'center', gap: 12 }}>
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                border: `1px solid var(--mm-btn-ghost-border, rgba(255,255,255,0.12))`,
+                background: 'var(--mm-btn-ghost-bg, rgba(255,255,255,0.06))',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'background 150ms, border-color 150ms',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--mm-btn-ghost-hover, rgba(255,255,255,0.1))')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--mm-btn-ghost-bg, rgba(255,255,255,0.06))')}
+            >
+              {theme === 'dark' ? (
+                <Sun size={16} color={T.textSecondary} />
+              ) : (
+                <Moon size={16} color={T.textSecondary} />
+              )}
+            </button>
             <Link
               href="/login"
               style={{
@@ -257,7 +355,7 @@ function Navbar() {
               style={{
                 fontSize: 14,
                 fontWeight: 500,
-                color: T.textPrimary,
+                color: '#FFFFFF',
                 background: T.accent,
                 border: 'none',
                 borderRadius: 100,
@@ -273,27 +371,47 @@ function Navbar() {
             </button>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="flex md:hidden"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
-            style={{
-              width: 44,
-              height: 44,
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            {mobileOpen ? (
-              <XIcon size={24} color={T.textPrimary} />
-            ) : (
-              <MenuIcon size={24} color={T.textPrimary} />
-            )}
-          </button>
+          {/* Mobile: theme toggle + hamburger */}
+          <div className="flex md:hidden" style={{ alignItems: 'center', gap: 4 }}>
+            <button
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              style={{
+                width: 40,
+                height: 40,
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              {theme === 'dark' ? (
+                <Sun size={20} color={T.textPrimary} />
+              ) : (
+                <Moon size={20} color={T.textPrimary} />
+              )}
+            </button>
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle menu"
+              style={{
+                width: 44,
+                height: 44,
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              {mobileOpen ? (
+                <XIcon size={24} color={T.textPrimary} />
+              ) : (
+                <MenuIcon size={24} color={T.textPrimary} />
+              )}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -305,28 +423,34 @@ function Navbar() {
             position: 'fixed',
             inset: 0,
             zIndex: 99,
-            background: 'rgba(10,10,10,0.98)',
+            background: T.overlayBg,
             backdropFilter: 'blur(20px)',
             padding: '80px 32px 32px',
             flexDirection: 'column',
             gap: 24,
           }}
         >
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              onClick={() => setMobileOpen(false)}
-              style={{
-                fontSize: 20,
-                fontWeight: 500,
-                color: T.textPrimary,
-                textDecoration: 'none',
-              }}
-            >
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) => {
+            const isActive = activeSection === l.href.replace('#', '')
+            return (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  fontSize: 20,
+                  fontWeight: 500,
+                  color: T.textPrimary,
+                  textDecoration: 'none',
+                  borderLeft: isActive ? `3px solid var(--mm-accent, #E63946)` : '3px solid transparent',
+                  paddingLeft: isActive ? 12 : 15,
+                  transition: 'border-color 200ms ease, padding-left 200ms ease',
+                }}
+              >
+                {l.label}
+              </a>
+            )
+          })}
           <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
             <Link
               href="/login"
@@ -338,7 +462,7 @@ function Navbar() {
                 color: T.textPrimary,
                 fontWeight: 500,
                 textDecoration: 'none',
-                border: '1px solid rgba(255,255,255,0.12)',
+                border: `1px solid var(--mm-btn-ghost-border, rgba(255,255,255,0.12))`,
               }}
             >
               Log In
@@ -352,7 +476,7 @@ function Navbar() {
                 textAlign: 'center',
                 padding: '14px 0',
                 borderRadius: 100,
-                color: T.textPrimary,
+                color: '#FFFFFF',
                 fontWeight: 600,
                 background: T.accent,
                 border: 'none',
@@ -375,10 +499,25 @@ function Navbar() {
    ═══════════════════════════════════════════════════════════ */
 function HeroSection() {
   const [loaded, setLoaded] = useState(false)
+  const [typedText, setTypedText] = useState('')
+  const fullText = 'a menu that sells.'
+
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 100)
     return () => clearTimeout(t)
   }, [])
+
+  /* Typewriter effect */
+  useEffect(() => {
+    if (!loaded) return
+    let idx = 0
+    const interval = setInterval(() => {
+      idx++
+      setTypedText(fullText.slice(0, idx))
+      if (idx >= fullText.length) clearInterval(interval)
+    }, 50)
+    return () => clearInterval(interval)
+  }, [loaded])
 
   const stagger = (i: number) =>
     loaded
@@ -393,14 +532,15 @@ function HeroSection() {
         alignItems: 'center',
         justifyContent: 'center',
         background: `
-          radial-gradient(ellipse 80% 50% at 50% -20%, rgba(230,57,70,0.15) 0%, transparent 50%),
-          radial-gradient(ellipse 60% 40% at 80% 50%, rgba(230,57,70,0.08) 0%, transparent 50%),
-          radial-gradient(ellipse 60% 40% at 20% 80%, rgba(52,199,89,0.05) 0%, transparent 50%),
-          ${T.bg}
+          radial-gradient(ellipse 80% 50% at 50% -20%, var(--mm-hero-radial1, rgba(230,57,70,0.15)) 0%, transparent 50%),
+          radial-gradient(ellipse 60% 40% at 80% 50%, var(--mm-hero-radial2, rgba(230,57,70,0.08)) 0%, transparent 50%),
+          radial-gradient(ellipse 60% 40% at 20% 80%, var(--mm-hero-radial3, rgba(52,199,89,0.05)) 0%, transparent 50%),
+          var(--mm-bg, #0A0A0A)
         `,
         padding: '100px 24px 60px',
         position: 'relative',
         overflow: 'hidden',
+        touchAction: 'pan-y',
       }}
     >
       <div className="mesh-orb-1" />
@@ -412,8 +552,8 @@ function HeroSection() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            background: 'rgba(230,57,70,0.1)',
-            border: '1px solid rgba(230,57,70,0.3)',
+            background: T.badgeBg,
+            border: `1px solid ${T.badgeBorder}`,
             borderRadius: 100,
             padding: '6px 12px',
             marginBottom: 24,
@@ -439,7 +579,10 @@ function HeroSection() {
         >
           Your restaurant deserves
           <br />
-          <span style={{ color: T.accent }}>a menu that sells.</span>
+          <span style={{ color: T.accent }}>
+            {typedText}
+            {typedText.length < fullText.length && <span className="typewriter-cursor" />}
+          </span>
         </h1>
 
         {/* Subheadline */}
@@ -494,8 +637,8 @@ function HeroSection() {
               window.open(waLink('Hi, I want to know more about MenuMate'), '_blank')
             }
             style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              background: T.btnGhostBg,
+              border: `1px solid ${T.btnGhostBorder}`,
               color: T.textPrimary,
               padding: '14px 24px',
               borderRadius: 100,
@@ -507,8 +650,8 @@ function HeroSection() {
               gap: 8,
               transition: 'background 150ms',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+            onMouseEnter={(e) => (e.currentTarget.style.background = T.btnGhostHover)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = T.btnGhostBg)}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill={T.waGreen}>
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
@@ -560,12 +703,12 @@ function HeroSection() {
             <span
               key={i}
               style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                background: T.trustBg,
+                border: `1px solid ${T.trustBorder}`,
                 borderRadius: 100,
                 padding: '6px 14px',
                 fontSize: 12,
-                color: 'rgba(255,255,255,0.4)',
+                color: T.trustText,
               }}
             >
               {text}
@@ -738,7 +881,7 @@ function HeroSection() {
                     key={item.name}
                     style={{
                       borderRadius: 10,
-                      border: '1px solid rgba(255,255,255,0.06)',
+                      border: `1px solid ${T.cardBorder}`,
                       overflow: 'hidden',
                       background: '#111114',
                       position: 'relative',
@@ -905,7 +1048,7 @@ function ProblemSolutionSection() {
   ]
 
   return (
-    <section style={{ background: '#0D0D0D', padding: '80px clamp(16px, 5vw, 40px)' }}>
+    <section style={{ background: T.sectionAlt, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -933,8 +1076,8 @@ function ProblemSolutionSection() {
           <AnimatedSection delay={100}>
             <div
               style={{
-                background: 'rgba(255,59,48,0.05)',
-                border: '1px solid rgba(255,59,48,0.15)',
+                background: T.problemBg,
+                border: `1px solid ${T.problemBorder}`,
                 borderRadius: 16,
                 padding: 24,
               }}
@@ -964,8 +1107,8 @@ function ProblemSolutionSection() {
           <AnimatedSection delay={200}>
             <div
               style={{
-                background: 'rgba(52,199,89,0.05)',
-                border: '1px solid rgba(52,199,89,0.15)',
+                background: T.solutionBg,
+                border: `1px solid ${T.solutionBorder}`,
                 borderRadius: 16,
                 padding: 24,
               }}
@@ -1022,7 +1165,7 @@ function HowItWorksSection() {
   ]
 
   return (
-    <section id="how-it-works" style={{ background: T.bg, padding: '80px clamp(16px, 5vw, 40px)' }}>
+    <section id="how-it-works" style={{ background: `radial-gradient(ellipse 80% 50% at 50% 0%, rgba(230,57,70,0.04) 0%, transparent 60%), ${T.bg}`, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -1055,7 +1198,7 @@ function HowItWorksSection() {
                 <div
                   style={{
                     background: T.surface,
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    border: `1px solid ${T.cardBorder}`,
                     borderRadius: 20,
                     padding: 28,
                     height: '100%',
@@ -1064,11 +1207,11 @@ function HowItWorksSection() {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-4px)'
-                    e.currentTarget.style.borderColor = 'rgba(230,57,70,0.2)'
+                    e.currentTarget.style.borderColor = T.cardBorderHover
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+                    e.currentTarget.style.borderColor = T.cardBorder
                   }}
                 >
                   <span
@@ -1097,7 +1240,7 @@ function HowItWorksSection() {
                   <p
                     style={{
                       fontSize: 14,
-                      color: 'rgba(255,255,255,0.5)',
+                      color: T.iconMuted,
                       lineHeight: 1.6,
                       marginTop: 8,
                     }}
@@ -1309,7 +1452,7 @@ function FeaturesSection() {
   ]
 
   return (
-    <section id="features" style={{ background: T.bg, padding: '80px clamp(16px, 5vw, 40px)' }}>
+    <section id="features" style={{ background: `radial-gradient(ellipse 60% 40% at 30% 50%, rgba(52,199,89,0.03) 0%, transparent 60%), ${T.bg}`, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -1340,19 +1483,21 @@ function FeaturesSection() {
               <div
                 style={{
                   background: T.surface,
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  border: `1px solid ${T.cardBorder}`,
                   borderRadius: 16,
                   padding: 24,
                   height: '100%',
-                  transition: 'all 200ms ease',
+                  transition: 'all 200ms ease, box-shadow 200ms ease',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = 'rgba(230,57,70,0.3)'
                   e.currentTarget.style.background = 'rgba(230,57,70,0.03)'
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(230,57,70,0.15), 0 8px 32px rgba(0,0,0,0.3)'
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+                  e.currentTarget.style.borderColor = T.cardBorder
                   e.currentTarget.style.background = T.surface
+                  e.currentTarget.style.boxShadow = 'none'
                 }}
               >
                 <div
@@ -1400,7 +1545,7 @@ function FeaturesSection() {
                 <p
                   style={{
                     fontSize: 13,
-                    color: 'rgba(255,255,255,0.5)',
+                    color: T.iconMuted,
                     lineHeight: 1.6,
                     marginTop: 8,
                   }}
@@ -1421,7 +1566,7 @@ function FeaturesSection() {
    ═══════════════════════════════════════════════════════════ */
 function RestaurantShowcaseSection() {
   return (
-    <section style={{ background: '#0D0D0D', padding: '80px clamp(16px, 5vw, 40px)' }}>
+    <section style={{ background: T.sectionAlt, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -1525,7 +1670,7 @@ function RestaurantShowcaseSection() {
                 ].map((item) => (
                   <div key={item.name} style={{
                     borderRadius: 10,
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    border: `1px solid ${T.cardBorder}`,
                     overflow: 'hidden',
                     background: '#111114',
                   }}>
@@ -1618,7 +1763,7 @@ function PricingSection() {
   ]
 
   return (
-    <section id="pricing" style={{ background: '#0D0D0D', padding: '80px clamp(16px, 5vw, 40px)' }}>
+    <section id="pricing" style={{ background: T.sectionAlt, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 880, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 16 }}>
@@ -1670,7 +1815,7 @@ function PricingSection() {
           {plans.map((plan, i) => (
             <AnimatedSection key={i} delay={i * 120 + 200}>
               <div
-                className={plan.popular ? 'pricing-shimmer' : ''}
+                className={plan.popular ? 'pricing-shimmer pro-gradient-border' : ''}
                 style={{
                   background: plan.popular
                     ? 'linear-gradient(135deg, rgba(230,57,70,0.08), rgba(26,16,16,0.95))'
@@ -1860,7 +2005,7 @@ function TestimonialsSection() {
   ]
 
   return (
-    <section style={{ background: T.bg, padding: '80px clamp(16px, 5vw, 40px)' }}>
+    <section style={{ background: `radial-gradient(ellipse 60% 40% at 70% 50%, rgba(230,57,70,0.04) 0%, transparent 60%), ${T.bg}`, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -1892,7 +2037,7 @@ function TestimonialsSection() {
                 className="testimonial-card"
                 style={{
                   background: T.surface,
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  border: `1px solid ${T.cardBorder}`,
                   borderRadius: 16,
                   padding: 28,
                   height: '100%',
@@ -1909,7 +2054,7 @@ function TestimonialsSection() {
                   e.currentTarget.classList.add('testimonial-card-hover')
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+                  e.currentTarget.style.borderColor = T.cardBorder
                   e.currentTarget.style.boxShadow = 'none'
                   e.currentTarget.classList.remove('testimonial-card-hover')
                 }}
@@ -1929,7 +2074,17 @@ function TestimonialsSection() {
                 </p>
                 <div style={{ display: 'flex', gap: 2, marginTop: 16 }}>
                   {[...Array(5)].map((_, si) => (
-                    <Star key={si} size={14} color={T.accent} fill={T.accent} />
+                    <Star
+                      key={si}
+                      size={14}
+                      color={T.accent}
+                      fill={T.accent}
+                      className="testimonial-star"
+                      style={{
+                        opacity: 0,
+                        animation: `starFadeIn 0.4s ease forwards ${i * 0.15 + si * 0.08}s`,
+                      }}
+                    />
                   ))}
                 </div>
                 <div style={{ marginTop: 12 }}>
@@ -2063,7 +2218,7 @@ function StatsCounterSection() {
               <div
                 style={{
                   background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  border: `1px solid ${T.cardBorder}`,
                   borderRadius: 16,
                   padding: '28px 16px',
                 }}
@@ -2096,7 +2251,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
     <div
       style={{
         background: open ? 'rgba(230,57,70,0.03)' : T.surface,
-        border: `1px solid ${open ? 'rgba(230,57,70,0.2)' : 'rgba(255,255,255,0.06)'}`,
+        border: `1px solid ${open ? T.cardBorderHover : T.cardBorder}`,
         borderRadius: 12,
         overflow: 'hidden',
         transition: 'border-color 200ms ease, background-color 200ms ease',
@@ -2190,7 +2345,7 @@ function FAQSection() {
   ]
 
   return (
-    <section id="faq" style={{ background: T.bg, padding: '80px clamp(16px, 5vw, 40px)' }}>
+    <section id="faq" style={{ background: `radial-gradient(ellipse 80% 50% at 50% 100%, rgba(230,57,70,0.03) 0%, transparent 60%), ${T.bg}`, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -2274,7 +2429,7 @@ I want to get started with MenuMate.`
   const labelStyle: React.CSSProperties = {
     fontSize: 12,
     fontWeight: 600,
-    color: 'rgba(255,255,255,0.5)',
+    color: T.iconMuted,
     textTransform: 'uppercase',
     letterSpacing: '0.08em',
     marginBottom: 6,
@@ -2284,7 +2439,7 @@ I want to get started with MenuMate.`
   const isFormValid = form.restaurantName && form.ownerName && form.phone
 
   return (
-    <section id="get-started" style={{ background: '#0D0D0D', padding: '80px clamp(16px, 5vw, 40px)' }}>
+    <section id="get-started" style={{ background: T.sectionAlt, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 560, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
@@ -2570,10 +2725,17 @@ function FooterSection() {
                     fontSize: 14,
                     color: T.textSecondary,
                     textDecoration: 'none',
-                    transition: 'color 150ms',
+                    transition: 'color 200ms, transform 200ms ease',
+                    display: 'inline-block',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = T.textPrimary)}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = T.textSecondary)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = T.textPrimary
+                    e.currentTarget.style.transform = 'translateX(4px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = T.textSecondary
+                    e.currentTarget.style.transform = 'translateX(0)'
+                  }}
                 >
                   {l.label}
                 </a>
@@ -2601,10 +2763,16 @@ function FooterSection() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 6,
-                  transition: 'opacity 150ms',
+                  transition: 'opacity 200ms, transform 200ms ease',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')}
-                onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.opacity = '0.8'
+                  e.currentTarget.style.transform = 'translateX(4px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = '1'
+                  e.currentTarget.style.transform = 'translateX(0)'
+                }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill={T.waGreen}>
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
@@ -2617,10 +2785,17 @@ function FooterSection() {
                   fontSize: 14,
                   color: T.textSecondary,
                   textDecoration: 'none',
-                  transition: 'color 150ms',
+                  transition: 'color 200ms, transform 200ms ease',
+                  display: 'inline-block',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = T.textPrimary)}
-                onMouseLeave={(e) => (e.currentTarget.style.color = T.textSecondary)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = T.textPrimary
+                  e.currentTarget.style.transform = 'translateX(4px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = T.textSecondary
+                  e.currentTarget.style.transform = 'translateX(0)'
+                }}
               >
                 hello@menumate.in
               </a>
@@ -2653,11 +2828,107 @@ function FooterSection() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   SCROLL TO TOP BUTTON
+   COOKIE CONSENT BANNER
+   ═══════════════════════════════════════════════════════════ */
+function CookieConsent() {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const consent = localStorage.getItem('menumate-cookie-consent')
+    if (!consent) {
+      const t = setTimeout(() => setVisible(true), 1500)
+      return () => clearTimeout(t)
+    }
+  }, [])
+
+  const handleAccept = () => {
+    localStorage.setItem('menumate-cookie-consent', 'accepted')
+    setVisible(false)
+  }
+
+  const handleDecline = () => {
+    localStorage.setItem('menumate-cookie-consent', 'declined')
+    setVisible(false)
+  }
+
+  if (!visible) return null
+
+  return (
+    <div
+      className="cookie-consent-enter"
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 60,
+        background: 'var(--mm-surface, #111111)',
+        borderTop: '1px solid var(--mm-card-border, rgba(255,255,255,0.06))',
+        padding: '16px clamp(16px, 5vw, 40px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 16,
+        flexWrap: 'wrap',
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.3)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: '1 1 auto', minWidth: 200 }}>
+        <Cookie size={20} color={T.accent} style={{ flexShrink: 0 }} />
+        <p style={{ fontSize: 13, color: T.textSecondary, lineHeight: 1.5, margin: 0 }}>
+          We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.
+        </p>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+        <button
+          onClick={handleDecline}
+          style={{
+            fontSize: 13,
+            fontWeight: 500,
+            color: T.textSecondary,
+            background: 'transparent',
+            border: `1px solid ${T.btnGhostBorder}`,
+            borderRadius: 100,
+            padding: '8px 18px',
+            cursor: 'pointer',
+            transition: 'background 150ms',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = T.btnGhostHover)}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+        >
+          Decline
+        </button>
+        <button
+          onClick={handleAccept}
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#FFFFFF',
+            background: T.accent,
+            border: 'none',
+            borderRadius: 100,
+            padding: '8px 18px',
+            cursor: 'pointer',
+            boxShadow: '0 0 12px rgba(230,57,70,0.3)',
+            transition: 'filter 150ms',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.filter = 'brightness(1.1)')}
+          onMouseLeave={(e) => (e.currentTarget.style.filter = 'brightness(1)')}
+        >
+          Accept
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLL TO TOP BUTTON (with progress indicator)
    ═══════════════════════════════════════════════════════════ */
 function ScrollToTopButton() {
   const [visible, setVisible] = useState(false)
   const [bounce, setBounce] = useState(false)
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
     let prev = false
@@ -2666,6 +2937,11 @@ function ScrollToTopButton() {
       if (show && !prev) setBounce(true)
       setVisible(show)
       prev = show
+
+      /* Calculate scroll progress */
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
+      const scrolled = scrollHeight > 0 ? window.scrollY / scrollHeight : 0
+      setProgress(Math.min(scrolled, 1))
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -2678,6 +2954,13 @@ function ScrollToTopButton() {
     }
   }, [bounce])
 
+  /* SVG circle properties */
+  const size = 48
+  const strokeWidth = 3
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+  const dashOffset = circumference - progress * circumference
+
   return (
     <button
       className={bounce ? 'scroll-top-bounce' : ''}
@@ -2688,25 +2971,73 @@ function ScrollToTopButton() {
         bottom: 24,
         right: 24,
         zIndex: 50,
-        width: 44,
-        height: 44,
+        width: size,
+        height: size,
         borderRadius: '50%',
-        background: T.accent,
+        background: 'transparent',
         border: 'none',
         cursor: visible ? 'pointer' : 'default',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: '0 4px 20px rgba(230,57,70,0.4)',
-        transition: 'transform 200ms ease, opacity 300ms ease',
+        transition: 'opacity 300ms ease',
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(20px)',
         pointerEvents: visible ? 'auto' : 'none',
+        padding: 0,
       }}
-      onMouseEnter={(e) => visible && (e.currentTarget.style.transform = 'translateY(-2px)')}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
     >
-      <ArrowUp size={20} color="#FFFFFF" />
+      {/* Progress ring */}
+      <svg
+        width={size}
+        height={size}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          transform: 'rotate(-90deg)',
+        }}
+      >
+        {/* Background track */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="var(--mm-card-border, rgba(255,255,255,0.1))"
+          strokeWidth={strokeWidth}
+        />
+        {/* Progress arc */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="var(--mm-accent, #E63946)"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={dashOffset}
+          style={{ transition: 'stroke-dashoffset 100ms ease' }}
+        />
+      </svg>
+      {/* Inner circle + arrow */}
+      <div
+        style={{
+          width: size - strokeWidth * 2 - 4,
+          height: size - strokeWidth * 2 - 4,
+          borderRadius: '50%',
+          background: 'var(--mm-accent, #E63946)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 20px rgba(230,57,70,0.4)',
+          transition: 'transform 200ms ease',
+        }}
+        onMouseEnter={(e) => visible && (e.currentTarget.style.transform = 'translateY(-2px)')}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+      >
+        <ArrowUp size={16} color="#FFFFFF" />
+      </div>
     </button>
   )
 }
@@ -2731,16 +3062,19 @@ export default function LandingPage() {
       <InquiryForm />
       <FooterSection />
       <ScrollToTopButton />
+      <CookieConsent />
 
       <style jsx global>{`
-        /* ── Stat counter pulse ── */
+        /* ── Stat counter pulse (bounce) ── */
         @keyframes statPulse {
           0% { transform: scale(1); }
-          50% { transform: scale(1.08); }
+          30% { transform: scale(1.05); }
+          60% { transform: scale(0.98); }
+          80% { transform: scale(1.01); }
           100% { transform: scale(1); }
         }
         .stat-pulse {
-          animation: statPulse 0.5s ease-in-out;
+          animation: statPulse 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         /* ── Stat glow underline ── */
@@ -2801,10 +3135,10 @@ export default function LandingPage() {
           100% { left: 200%; }
         }
 
-        /* ── Popular badge pulse ── */
+        /* ── Popular badge pulse + glow ── */
         @keyframes badgePulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(230,57,70,0.5); }
-          50% { box-shadow: 0 0 0 8px rgba(230,57,70,0); }
+          0%, 100% { box-shadow: 0 0 0 0 rgba(230,57,70,0.5), 0 0 12px rgba(230,57,70,0.3); }
+          50% { box-shadow: 0 0 0 8px rgba(230,57,70,0), 0 0 20px rgba(230,57,70,0.5); }
         }
         .popular-badge {
           animation: badgePulse 2s ease-in-out infinite;
@@ -2819,6 +3153,41 @@ export default function LandingPage() {
         }
         .scroll-top-bounce {
           animation: scrollTopBounce 0.5s ease-out;
+        }
+
+        /* ── Testimonial star staggered fade-in ── */
+        @keyframes starFadeIn {
+          0% { opacity: 0; transform: scale(0.5); }
+          60% { opacity: 1; transform: scale(1.15); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        .testimonial-star {
+          display: inline-block;
+        }
+
+        /* ── Pro card animated gradient border ── */
+        @property --border-angle {
+          syntax: '<angle>';
+          initial-value: 0deg;
+          inherits: false;
+        }
+        .pro-gradient-border::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 20px;
+          padding: 2px;
+          background: conic-gradient(from var(--border-angle), #E63946, #FF6B6B, #E63946, #B71C1C, #E63946);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          z-index: 0;
+          pointer-events: none;
+          animation: rotateGradientBorder 4s linear infinite;
+        }
+        @keyframes rotateGradientBorder {
+          to { --border-angle: 360deg; }
         }
       `}</style>
     </div>

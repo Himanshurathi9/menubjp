@@ -50,12 +50,21 @@ function FoodDot({ type }: { type: FoodType }) {
 }
 
 // ─── Lock body scroll ─────────────────────────────────────────
+let bodyLockCount = 0
 function useBodyLock(locked: boolean) {
   useEffect(() => {
     if (locked) {
-      const prev = document.body.style.overflow
-      document.body.style.overflow = 'hidden'
-      return () => { document.body.style.overflow = prev || '' }
+      bodyLockCount++
+      if (bodyLockCount === 1) {
+        document.body.style.overflow = 'hidden'
+      }
+      return () => {
+        bodyLockCount--
+        if (bodyLockCount <= 0) {
+          bodyLockCount = 0
+          document.body.style.overflow = ''
+        }
+      }
     }
   }, [locked])
 }
