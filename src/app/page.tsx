@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
 import Link from 'next/link'
 import QRCode from 'qrcode'
 import {
@@ -70,6 +70,7 @@ function useInView(threshold = 0.15) {
 
 function useCountUp(target: number, duration = 2000) {
   const [count, setCount] = useState(0)
+  const [done, setDone] = useState(false)
   const { ref, inView } = useInView(0.3)
   const hasStarted = useRef(false)
 
@@ -84,12 +85,14 @@ function useCountUp(target: number, duration = 2000) {
       setCount(Math.round(eased * target))
       if (progress < 1) {
         requestAnimationFrame(step)
+      } else {
+        setDone(true)
       }
     }
     requestAnimationFrame(step)
   }, [inView, target, duration])
 
-  return { count, ref }
+  return { count, done, ref }
 }
 
 function useScrollDirection() {
@@ -182,12 +185,13 @@ function Navbar() {
           right: 0,
           zIndex: 100,
           height: 64,
-          background: 'rgba(10,10,10,0.8)',
+          background: scrollY > 50 ? 'rgba(10,10,10,0.95)' : 'rgba(10,10,10,0.8)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
+          boxShadow: scrollY > 50 ? '0 4px 20px rgba(0,0,0,0.3)' : 'none',
           padding: '0 clamp(16px, 5vw, 40px)',
-          transition: 'top 0.3s ease',
+          transition: 'top 0.3s ease, background 0.3s ease, box-shadow 0.3s ease',
         }}
       >
         <div
@@ -536,13 +540,46 @@ function HeroSection() {
           ))}
         </div>
 
+        {/* Trust Badges */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+            justifyContent: 'center',
+            marginTop: 20,
+            ...stagger(5),
+          }}
+        >
+          {[
+            '🔒 Secure Payments',
+            '⚡ Instant Setup',
+            '🇮🇳 Made in India',
+            '💬 WhatsApp Native',
+          ].map((text, i) => (
+            <span
+              key={i}
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: 100,
+                padding: '6px 14px',
+                fontSize: 12,
+                color: 'rgba(255,255,255,0.4)',
+              }}
+            >
+              {text}
+            </span>
+          ))}
+        </div>
+
         {/* Phone mockup */}
         <div
           style={{
             marginTop: 48,
             display: 'flex',
             justifyContent: 'center',
-            ...stagger(5),
+            ...stagger(6),
           }}
         >
           <div
@@ -1013,78 +1050,98 @@ function HowItWorksSection() {
           }}
         >
           {steps.map((s, i) => (
-            <AnimatedSection key={i} delay={i * 120}>
-              <div
-                style={{
-                  background: T.surface,
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  borderRadius: 20,
-                  padding: 28,
-                  height: '100%',
-                  position: 'relative',
-                  transition: 'transform 200ms ease, border-color 200ms ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)'
-                  e.currentTarget.style.borderColor = 'rgba(230,57,70,0.2)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
-                }}
-              >
-                <span
+            <Fragment key={i}>
+              <AnimatedSection delay={i * 120}>
+                <div
                   style={{
-                    fontSize: 48,
-                    fontWeight: 900,
-                    color: 'rgba(230,57,70,0.2)',
-                    display: 'block',
-                    marginBottom: 12,
-                    lineHeight: 1,
+                    background: T.surface,
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: 20,
+                    padding: 28,
+                    height: '100%',
+                    position: 'relative',
+                    transition: 'transform 200ms ease, border-color 200ms ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)'
+                    e.currentTarget.style.borderColor = 'rgba(230,57,70,0.2)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
                   }}
                 >
-                  {s.num}
-                </span>
-                {s.icon}
-                <h3
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 700,
-                    color: T.textPrimary,
-                    marginTop: 16,
-                  }}
-                >
-                  {s.title}
-                </h3>
-                <p
-                  style={{
-                    fontSize: 14,
-                    color: 'rgba(255,255,255,0.5)',
-                    lineHeight: 1.6,
-                    marginTop: 8,
-                  }}
-                >
-                  {s.desc}
-                </p>
-
-                {/* Arrow */}
-                {i < steps.length - 1 && (
-                  <div
-                    className="hidden md:block"
+                  <span
                     style={{
-                      position: 'absolute',
-                      right: -24,
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: T.accent,
-                      fontSize: 24,
+                      fontSize: 48,
+                      fontWeight: 900,
+                      color: 'rgba(230,57,70,0.2)',
+                      display: 'block',
+                      marginBottom: 12,
+                      lineHeight: 1,
                     }}
                   >
-                    →
-                  </div>
-                )}
-              </div>
-            </AnimatedSection>
+                    {s.num}
+                  </span>
+                  {s.icon}
+                  <h3
+                    style={{
+                      fontSize: 18,
+                      fontWeight: 700,
+                      color: T.textPrimary,
+                      marginTop: 16,
+                    }}
+                  >
+                    {s.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: 14,
+                      color: 'rgba(255,255,255,0.5)',
+                      lineHeight: 1.6,
+                      marginTop: 8,
+                    }}
+                  >
+                    {s.desc}
+                  </p>
+
+                  {/* Arrow */}
+                  {i < steps.length - 1 && (
+                    <div
+                      className="hidden md:block"
+                      style={{
+                        position: 'absolute',
+                        right: -24,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: T.accent,
+                        fontSize: 24,
+                      }}
+                    >
+                      →
+                    </div>
+                  )}
+                </div>
+              </AnimatedSection>
+              {/* Mobile vertical connector */}
+              {i < steps.length - 1 && (
+                <div
+                  className="flex md:hidden"
+                  style={{
+                    justifyContent: 'center',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 2,
+                      background: 'rgba(255,255,255,0.06)',
+                      height: 32,
+                      margin: '0 auto',
+                    }}
+                  />
+                </div>
+              )}
+            </Fragment>
           ))}
         </div>
       </div>
@@ -1613,6 +1670,7 @@ function PricingSection() {
           {plans.map((plan, i) => (
             <AnimatedSection key={i} delay={i * 120 + 200}>
               <div
+                className={plan.popular ? 'pricing-shimmer' : ''}
                 style={{
                   background: plan.popular
                     ? 'linear-gradient(135deg, rgba(230,57,70,0.08), rgba(26,16,16,0.95))'
@@ -1625,6 +1683,7 @@ function PricingSection() {
                   borderRadius: 20,
                   padding: 'clamp(20px, 5vw, 32px)',
                   position: 'relative',
+                  overflow: 'hidden',
                   boxShadow: plan.popular ? '0 0 40px rgba(230,57,70,0.1)' : 'none',
                   transition: 'box-shadow 200ms ease',
                 }}
@@ -1640,6 +1699,7 @@ function PricingSection() {
                 {/* Most popular badge */}
                 {plan.popular && (
                   <div
+                    className="popular-badge"
                     style={{
                       position: 'absolute',
                       top: -12,
@@ -1651,6 +1711,7 @@ function PricingSection() {
                       fontWeight: 700,
                       padding: '4px 16px',
                       borderRadius: 100,
+                      zIndex: 2,
                     }}
                   >
                     MOST POPULAR
@@ -1828,6 +1889,7 @@ function TestimonialsSection() {
           {testimonials.map((t, i) => (
             <AnimatedSection key={i} delay={i * 120}>
               <div
+                className="testimonial-card"
                 style={{
                   background: T.surface,
                   border: '1px solid rgba(255,255,255,0.06)',
@@ -1836,15 +1898,20 @@ function TestimonialsSection() {
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  zIndex: 0,
                   transition: 'border-color 300ms ease, box-shadow 300ms ease',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = 'rgba(230,57,70,0.3)'
                   e.currentTarget.style.boxShadow = '0 0 30px rgba(230,57,70,0.08)'
+                  e.currentTarget.classList.add('testimonial-card-hover')
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
                   e.currentTarget.style.boxShadow = 'none'
+                  e.currentTarget.classList.remove('testimonial-card-hover')
                 }}
               >
                 <MessageCircle size={24} color={T.accent} style={{ opacity: 0.6 }} />
@@ -1905,19 +1972,37 @@ function TestimonialsSection() {
    SECTION — STATS COUNTER
    ═══════════════════════════════════════════════════════════ */
 function StatCounter({ target, suffix, label, duration = 2000, formatter }: { target: number; suffix: string; label: string; duration?: number; formatter?: (n: number) => string }) {
-  const { count, ref } = useCountUp(target, duration)
+  const { count, done, ref } = useCountUp(target, duration)
   return (
     <div ref={ref} style={{ textAlign: 'center', padding: '20px 16px' }}>
       <div
+        className={done ? 'stat-pulse' : ''}
         style={{
           fontSize: 'clamp(32px, 5vw, 48px)',
           fontWeight: 800,
           color: T.accent,
           letterSpacing: '-0.03em',
           lineHeight: 1,
+          position: 'relative',
+          display: 'inline-block',
         }}
       >
         {formatter ? formatter(count) : count}{suffix}
+        {done && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: -6,
+              left: '10%',
+              right: '10%',
+              height: 3,
+              borderRadius: 2,
+              background: `linear-gradient(90deg, transparent, ${T.accent}, transparent)`,
+              boxShadow: `0 0 12px ${T.accent}, 0 0 24px rgba(230,57,70,0.3)`,
+              animation: 'glowUnderline 2s ease-in-out infinite',
+            }}
+          />
+        )}
       </div>
       <p
         style={{
@@ -2010,11 +2095,11 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
     <div
       style={{
-        background: T.surface,
+        background: open ? 'rgba(230,57,70,0.03)' : T.surface,
         border: `1px solid ${open ? 'rgba(230,57,70,0.2)' : 'rgba(255,255,255,0.06)'}`,
         borderRadius: 12,
         overflow: 'hidden',
-        transition: 'border-color 200ms ease',
+        transition: 'border-color 200ms ease, background-color 200ms ease',
       }}
     >
       <button
@@ -2045,9 +2130,10 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         <ChevronDown
           size={20}
           color={T.textSecondary}
+          className="faq-chevron"
           style={{
             flexShrink: 0,
-            transition: 'transform 300ms ease',
+            transition: 'transform 300ms cubic-bezier(0.4,0,0.2,1)',
             transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
           }}
         />
@@ -2056,7 +2142,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         style={{
           maxHeight: open ? maxH : 0,
           overflow: 'hidden',
-          transition: 'max-height 300ms ease',
+          transition: 'max-height 400ms cubic-bezier(0.4,0,0.2,1)',
         }}
       >
         <div ref={contentRef} style={{ padding: '0 24px 20px' }}>
@@ -2571,19 +2657,30 @@ function FooterSection() {
    ═══════════════════════════════════════════════════════════ */
 function ScrollToTopButton() {
   const [visible, setVisible] = useState(false)
+  const [bounce, setBounce] = useState(false)
 
   useEffect(() => {
+    let prev = false
     const onScroll = () => {
-      setVisible(window.scrollY > 400)
+      const show = window.scrollY > 400
+      if (show && !prev) setBounce(true)
+      setVisible(show)
+      prev = show
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  if (!visible) return null
+  useEffect(() => {
+    if (bounce) {
+      const t = setTimeout(() => setBounce(false), 500)
+      return () => clearTimeout(t)
+    }
+  }, [bounce])
 
   return (
     <button
+      className={bounce ? 'scroll-top-bounce' : ''}
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Scroll to top"
       style={{
@@ -2596,16 +2693,17 @@ function ScrollToTopButton() {
         borderRadius: '50%',
         background: T.accent,
         border: 'none',
-        cursor: 'pointer',
+        cursor: visible ? 'pointer' : 'default',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         boxShadow: '0 4px 20px rgba(230,57,70,0.4)',
-        transition: 'transform 200ms ease, opacity 200ms ease',
+        transition: 'transform 200ms ease, opacity 300ms ease',
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(10px)',
+        transform: visible ? 'translateY(0)' : 'translateY(20px)',
+        pointerEvents: visible ? 'auto' : 'none',
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+      onMouseEnter={(e) => visible && (e.currentTarget.style.transform = 'translateY(-2px)')}
       onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
     >
       <ArrowUp size={20} color="#FFFFFF" />
@@ -2633,6 +2731,96 @@ export default function LandingPage() {
       <InquiryForm />
       <FooterSection />
       <ScrollToTopButton />
+
+      <style jsx global>{`
+        /* ── Stat counter pulse ── */
+        @keyframes statPulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.08); }
+          100% { transform: scale(1); }
+        }
+        .stat-pulse {
+          animation: statPulse 0.5s ease-in-out;
+        }
+
+        /* ── Stat glow underline ── */
+        @keyframes glowUnderline {
+          0%, 100% { opacity: 0.7; }
+          50% { opacity: 1; }
+        }
+
+        /* ── Testimonial gradient shimmer ── */
+        .testimonial-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -150%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(230,57,70,0.12),
+            rgba(230,57,70,0.22),
+            rgba(230,57,70,0.12),
+            transparent
+          );
+          z-index: -1;
+          pointer-events: none;
+        }
+        .testimonial-card-hover::before {
+          animation: testimonialShimmer 1.2s ease forwards;
+        }
+        @keyframes testimonialShimmer {
+          0% { left: -150%; }
+          100% { left: 150%; }
+        }
+
+        /* ── Pricing card shimmer ── */
+        .pricing-shimmer::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 60%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0.04),
+            rgba(255,255,255,0.07),
+            rgba(255,255,255,0.04),
+            transparent
+          );
+          animation: pricingShimmer 4s ease-in-out infinite;
+          pointer-events: none;
+          z-index: 1;
+        }
+        @keyframes pricingShimmer {
+          0% { left: -100%; }
+          100% { left: 200%; }
+        }
+
+        /* ── Popular badge pulse ── */
+        @keyframes badgePulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(230,57,70,0.5); }
+          50% { box-shadow: 0 0 0 8px rgba(230,57,70,0); }
+        }
+        .popular-badge {
+          animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        /* ── Scroll-to-top bounce ── */
+        @keyframes scrollTopBounce {
+          0% { transform: translateY(20px); opacity: 0; }
+          50% { transform: translateY(-4px); opacity: 1; }
+          70% { transform: translateY(2px); }
+          100% { transform: translateY(0); }
+        }
+        .scroll-top-bounce {
+          animation: scrollTopBounce 0.5s ease-out;
+        }
+      `}</style>
     </div>
   )
 }

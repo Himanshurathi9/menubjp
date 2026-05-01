@@ -7,6 +7,15 @@ import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { env } from '@/lib/env'
 
+/* ── Particle data (generated once) ── */
+const PARTICLES = Array.from({ length: 15 }, (_, i) => ({
+  id: i,
+  left: `${Math.random() * 100}%`,
+  size: 2 + Math.random() * 2,
+  duration: 14 + Math.random() * 18,
+  delay: Math.random() * 12,
+}))
+
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
@@ -14,6 +23,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [focusedField, setFocusedField] = useState<'email' | 'password' | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -59,25 +69,37 @@ export default function LoginPage() {
     color: '#1A1A1A',
     width: '100%',
     outline: 'none',
-    transition: 'border-color 200ms, box-shadow 200ms',
+    transition: 'border-color 250ms ease, box-shadow 400ms ease',
     boxSizing: 'border-box',
   }
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.currentTarget.style.borderColor = '#1A1A1A'
-    e.currentTarget.style.boxShadow = '0 0 0 4px rgba(26,26,26,0.06)'
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>, field: 'email' | 'password') => {
+    setFocusedField(field)
+    e.currentTarget.style.borderColor = '#E63946'
+    // Brief pulse then settle to steady glow
+    e.currentTarget.style.boxShadow = '0 0 0 5px rgba(230,57,70,0.18)'
+    setTimeout(() => {
+      if (document.activeElement === e.currentTarget) {
+        e.currentTarget.style.boxShadow = '0 0 0 4px rgba(230,57,70,0.10)'
+      }
+    }, 300)
   }
+
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setFocusedField(null)
     e.currentTarget.style.borderColor = '#E5E5EA'
     e.currentTarget.style.boxShadow = 'none'
   }
-  const labelStyle: React.CSSProperties = {
+
+  const labelStyle = (field: 'email' | 'password'): React.CSSProperties => ({
     fontSize: 11,
     fontWeight: 700,
-    color: '#AEAEB2',
+    color: focusedField === field ? '#E63946' : '#AEAEB2',
     letterSpacing: '0.08em',
     marginBottom: 6,
     display: 'block',
-  }
+    transition: 'color 300ms ease',
+  })
 
   return (
     <main style={{ display: 'flex', minHeight: '100dvh' }}>
@@ -207,15 +229,35 @@ export default function LoginPage() {
           padding: '40px 20px',
           minHeight: '100dvh',
           boxSizing: 'border-box',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
+        {/* ── Animated background particles ── */}
+        {PARTICLES.map((p) => (
+          <div
+            key={p.id}
+            className="login-particle"
+            style={{
+              position: 'absolute',
+              left: p.left,
+              bottom: -10,
+              width: p.size,
+              height: p.size,
+              borderRadius: '50%',
+              background: '#1A1A1A',
+              pointerEvents: 'none',
+              animation: `login-float-up ${p.duration}s ${p.delay}s linear infinite`,
+            }}
+          />
+        ))}
+
         <div
-          className="animate-page-enter animate-page-enter-1"
           style={{ width: '100%', maxWidth: 380, boxSizing: 'border-box' }}
         >
-          {/* Mobile-only logo */}
+          {/* Mobile-only logo — stagger 1 */}
           <div
-            className="flex items-center gap-2 mb-8 lg:hidden"
+            className="login-stagger-1 flex items-center gap-2 mb-8 lg:hidden"
           >
             <div
               style={{
@@ -233,33 +275,35 @@ export default function LoginPage() {
             <span style={{ fontSize: 20, fontWeight: 800, color: '#1A1A1A' }}>MenuMate</span>
           </div>
 
-          {/* Heading */}
-          <h1
-            style={{
-              fontSize: 28,
-              fontWeight: 800,
-              color: '#1A1A1A',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.2,
-            }}
-          >
-            Welcome back
-          </h1>
-          <p
-            style={{
-              fontSize: 14,
-              color: '#6E6E73',
-              marginTop: 4,
-            }}
-          >
-            Sign in to manage your restaurant
-          </p>
+          {/* Heading — stagger 2 */}
+          <div className="login-stagger-2">
+            <h1
+              style={{
+                fontSize: 28,
+                fontWeight: 800,
+                color: '#1A1A1A',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.2,
+              }}
+            >
+              Welcome back
+            </h1>
+            <p
+              style={{
+                fontSize: 14,
+                color: '#6E6E73',
+                marginTop: 4,
+              }}
+            >
+              Sign in to manage your restaurant
+            </p>
+          </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} style={{ marginTop: 32 }}>
+          {/* Form — stagger 3 */}
+          <form onSubmit={handleSubmit} className="login-stagger-3" style={{ marginTop: 32 }}>
             {/* Email */}
             <div>
-              <label htmlFor="email" style={labelStyle}>
+              <label htmlFor="email" style={labelStyle('email')}>
                 EMAIL ADDRESS
               </label>
               <input
@@ -271,14 +315,14 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 style={inputStyle}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                onFocus={(e) => handleFocus(e, 'email')}
+                onBlur={(e) => handleBlur(e)}
               />
             </div>
 
             {/* Password */}
             <div style={{ marginTop: 16 }}>
-              <label htmlFor="password" style={labelStyle}>
+              <label htmlFor="password" style={labelStyle('password')}>
                 PASSWORD
               </label>
               <div style={{ position: 'relative' }}>
@@ -291,13 +335,14 @@ export default function LoginPage() {
                   required
                   autoComplete="current-password"
                   style={{ ...inputStyle, paddingRight: 48 }}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
+                  onFocus={(e) => handleFocus(e, 'password')}
+                  onBlur={(e) => handleBlur(e)}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="login-eye-toggle"
                   style={{
                     position: 'absolute',
                     right: 4,
@@ -312,13 +357,16 @@ export default function LoginPage() {
                     border: 'none',
                     cursor: 'pointer',
                     color: '#AEAEB2',
-                    transition: 'color 150ms',
+                    transition: 'color 250ms ease, opacity 250ms ease',
+                    opacity: 0.7,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.color = '#6E6E73'
+                    e.currentTarget.style.color = '#1A1A1A'
+                    e.currentTarget.style.opacity = '1'
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.color = '#AEAEB2'
+                    e.currentTarget.style.opacity = '0.7'
                   }}
                 >
                   {showPassword ? (
@@ -333,7 +381,7 @@ export default function LoginPage() {
             {/* Error */}
             {error && (
               <div
-                className="animate-fade-in"
+                className="login-shake"
                 style={{
                   marginTop: 12,
                   display: 'flex',
@@ -354,6 +402,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
+              className="login-submit-btn"
               style={{
                 width: '100%',
                 height: 52,
@@ -369,22 +418,32 @@ export default function LoginPage() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 8,
-                transition: 'all 150ms ease',
+                transition: 'background 200ms ease, transform 200ms ease',
                 transform: 'scale(1)',
+                position: 'relative',
+                overflow: 'hidden',
               }}
               onMouseEnter={(e) => {
-                if (!loading) e.currentTarget.style.background = '#2C2C2E'
+                if (!loading) {
+                  e.currentTarget.style.background = '#2C2C2E'
+                  e.currentTarget.style.transform = 'scale(1.02)'
+                }
               }}
               onMouseLeave={(e) => {
-                if (!loading) e.currentTarget.style.background = '#1A1A1A'
+                if (!loading) {
+                  e.currentTarget.style.background = '#1A1A1A'
+                  e.currentTarget.style.transform = 'scale(1)'
+                }
               }}
               onMouseDown={(e) => {
                 if (!loading) e.currentTarget.style.transform = 'scale(0.98)'
               }}
               onMouseUp={(e) => {
-                e.currentTarget.style.transform = 'scale(1)'
+                if (!loading) e.currentTarget.style.transform = 'scale(1.02)'
               }}
             >
+              {/* Shimmer overlay */}
+              {!loading && <span className="login-btn-shimmer" />}
               {loading ? (
                 <>
                   <Loader2 style={{ width: 18, height: 18 }} className="animate-spin" />
@@ -396,8 +455,8 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Divider + WhatsApp link */}
-          <div style={{ marginTop: 24 }}>
+          {/* Divider + WhatsApp link — stagger 4 */}
+          <div className="login-stagger-4" style={{ marginTop: 24 }}>
             {/* "or" divider */}
             <div
               style={{
@@ -448,6 +507,115 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* ═══════════════════════════════════════════════════
+          Global CSS Animations
+          ═══════════════════════════════════════════════════ */}
+      <style jsx global>{`
+        /* ── Floating particles ── */
+        @keyframes login-float-up {
+          0% {
+            transform: translateY(0) translateX(0);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.04;
+          }
+          90% {
+            opacity: 0.04;
+          }
+          100% {
+            transform: translateY(-110vh) translateX(20px);
+            opacity: 0;
+          }
+        }
+
+        .login-particle {
+          will-change: transform, opacity;
+        }
+
+        /* ── Staggered page entrance ── */
+        @keyframes login-fade-up {
+          from {
+            opacity: 0;
+            transform: translateY(16px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .login-stagger-1 {
+          animation: login-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+        }
+        .login-stagger-2 {
+          animation: login-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+        }
+        .login-stagger-3 {
+          animation: login-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.36s both;
+        }
+        .login-stagger-4 {
+          animation: login-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.48s both;
+        }
+
+        /* ── Error shake ── */
+        @keyframes login-shake {
+          0%, 100% { transform: translateX(0); }
+          15% { transform: translateX(-6px); }
+          30% { transform: translateX(5px); }
+          45% { transform: translateX(-4px); }
+          60% { transform: translateX(3px); }
+          75% { transform: translateX(-1px); }
+        }
+
+        .login-shake {
+          animation: login-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        /* ── Submit button shimmer ── */
+        @keyframes login-shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(200%);
+          }
+        }
+
+        .login-submit-btn {
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .login-submit-btn:hover .login-btn-shimmer {
+          animation: login-shimmer 0.8s ease-in-out;
+        }
+
+        .login-btn-shimmer {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.12),
+            transparent
+          );
+          transform: translateX(-100%);
+          pointer-events: none;
+        }
+
+        /* ── Eye toggle smooth transition ── */
+        .login-eye-toggle svg {
+          transition: transform 200ms ease, opacity 200ms ease;
+        }
+
+        .login-eye-toggle:hover svg {
+          transform: scale(1.08);
+        }
+      `}</style>
     </main>
   )
 }
