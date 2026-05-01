@@ -63,3 +63,40 @@ Stage Summary:
 3. `reactStrictMode: false`
 4. Debug `console.log` statements in Settings page
 5. Orphaned Prisma/SQLite setup alongside Supabase
+
+---
+
+Task ID: 2
+Agent: Enhancement Agent
+Task: Enhance MenuMate landing page with Testimonials, Stats Counter, FAQ, Footer, Scroll-to-Top, and Navbar FAQ link
+
+Work Log:
+- Added `ArrowUp` to lucide-react imports
+- Added `{ label: 'FAQ', href: '#faq' }` to navbar links array (between Pricing and Demo)
+- Added `useCountUp` hook after existing `useInView` hook — animates from 0 to target number using requestAnimationFrame with cubic easing when section enters viewport
+- Replaced existing TestimonialsSection with new spec: 3 cards (Rajesh Patel/Brew House Cafe, Priya Sharma/The Spice Kitchen, Amit Desai/Pizza Planet) with MessageCircle quote icon, Star rating (5 stars), accent border glow on hover
+- Added StatsCounterSection with 4 animated counters: 50+ Restaurants, 10,000+ Orders, 99.9% Uptime (custom formatter for decimal), 24hr Setup time
+- Added FAQSection with id="faq" containing 6 accordion FAQ items with ChevronDown rotation animation and smooth max-height transitions (ref access moved to useEffect to satisfy React compiler rules)
+- Replaced FooterSection with enhanced version: MenuMate logo + "Digital menus that sell" tagline, Navigation links (How it Works, Features, Pricing, FAQ), Contact section (WhatsApp CTA + email), gradient top border, "© 2024 MenuMate. All rights reserved." copyright
+- Added ScrollToTopButton: floating button (bottom-right, z-50) with ArrowUp icon, appears when scrolled > 400px, smooth scroll behavior, hover lift effect
+- Updated main LandingPage render to include: TestimonialsSection → StatsCounterSection → FAQSection → InquiryForm → FooterSection → ScrollToTopButton
+
+Lint Results:
+- No new errors introduced (only pre-existing run-dev.js require-import errors)
+- Fixed React compiler error: ref access during render in FAQItem moved to useEffect with state
+- Fixed Image component lint warning by renaming to ImageIcon
+
+Additional fixes by Main Agent:
+- Added `allowedDevOrigins: ['21.0.18.103']` to next.config.ts to suppress cross-origin warning
+- Renamed `Image` lucide import to `ImageIcon` to fix jsx-a11y/alt-text false positive
+
+Dev Server:
+- Page compiles successfully (200 OK, compile: 818ms → 1248ms with new sections)
+- Page size grew from 83KB to 107KB (expected with new sections)
+
+Stage Summary:
+- All 6 requested additions implemented and verified
+- Code style matches existing patterns (inline styles, T tokens, AnimatedSection wrapper, lucide icons)
+- No existing sections modified (Navbar, Hero, Problem/Solution, How It Works, Demo, Features, Pricing all untouched except Navbar links array)
+- New sections: Testimonials, Stats Counter, FAQ (accordion), Footer, Scroll-to-Top button
+- FAQ nav link added to navbar

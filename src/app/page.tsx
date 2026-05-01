@@ -18,8 +18,9 @@ import {
   Zap,
   BarChart3,
   Smartphone,
-  Image,
+  Image as ImageIcon,
   ClipboardList,
+  ArrowUp,
 } from 'lucide-react'
 
 /* ── WhatsApp helper (uses env.ts — NO hardcoded numbers) ── */
@@ -65,6 +66,30 @@ function useInView(threshold = 0.15) {
     return () => obs.disconnect()
   }, [threshold])
   return { ref, inView }
+}
+
+function useCountUp(target: number, duration = 2000) {
+  const [count, setCount] = useState(0)
+  const { ref, inView } = useInView(0.3)
+  const hasStarted = useRef(false)
+
+  useEffect(() => {
+    if (!inView || hasStarted.current) return
+    hasStarted.current = true
+    const startTime = performance.now()
+    const step = (now: number) => {
+      const elapsed = now - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setCount(Math.round(eased * target))
+      if (progress < 1) {
+        requestAnimationFrame(step)
+      }
+    }
+    requestAnimationFrame(step)
+  }, [inView, target, duration])
+
+  return { count, ref }
 }
 
 function useScrollDirection() {
@@ -143,6 +168,7 @@ function Navbar() {
     { label: 'How it Works', href: '#how-it-works' },
     { label: 'Features', href: '#features' },
     { label: 'Pricing', href: '#pricing' },
+    { label: 'FAQ', href: '#faq' },
     { label: 'Demo', href: '#demo' },
   ]
 
@@ -1167,7 +1193,7 @@ function FeaturesSection() {
       badge: 'PRO',
     },
     {
-      icon: <Image size={20} color={T.accent} />,
+      icon: <ImageIcon size={20} color={T.accent} />,
       title: 'Promotional Banners',
       desc: 'Run festival offers, happy hours, new launches. Schedule them in advance. Auto on/off.',
       badge: null,
@@ -1558,28 +1584,25 @@ function PricingSection() {
 function TestimonialsSection() {
   const testimonials = [
     {
-      text: 'Aap ne jo promise kiya tha exactly waisi cheez mili. Customers ab khud order karte hain, galtiyan zero ho gayi.',
+      text: 'MenuMate changed everything. We get 40+ orders daily through QR now. No more wrong orders!',
       name: 'Rajesh Patel',
-      restaurant: 'Spice Garden, Surat',
-      initials: 'RP',
+      restaurant: 'Brew House Cafe',
     },
     {
-      text: 'Pehle menu print karana ₹4,000 lagta tha. Ab sirf phone mein update karta hoon. MenuMate ne sach mein life easy kar di.',
-      name: 'Priya Shah',
-      restaurant: 'Cafe Bloom, Adajan',
-      initials: 'PS',
+      text: 'The stamp card feature alone has brought back 30% of our customers. Best investment ever.',
+      name: 'Priya Sharma',
+      restaurant: 'The Spice Kitchen',
     },
     {
-      text: 'WhatsApp pe seedha order aata hai table number ke saath. Kitchen staff ko samajh aata hai, mistakes nahi hote. Highly recommended.',
+      text: 'Setup was done in one day. My customers love the digital menu. I love the WhatsApp orders.',
       name: 'Amit Desai',
-      restaurant: 'The Coffee Stop, Vesu',
-      initials: 'AD',
+      restaurant: 'Pizza Planet',
     },
   ]
 
   return (
-    <section style={{ background: T.bg, padding: '80px 40px' }}>
-      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+    <section style={{ background: T.bg, padding: '80px clamp(16px, 4vw, 40px)' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <SectionLabel text="TESTIMONIALS" />
@@ -1598,11 +1621,10 @@ function TestimonialsSection() {
         </AnimatedSection>
 
         <div
-          className="grid md:grid-cols-3"
           style={{
             display: 'grid',
-            gap: 16,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+            gap: 20,
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
           }}
         >
           {testimonials.map((t, i) => (
@@ -1612,50 +1634,285 @@ function TestimonialsSection() {
                   background: T.surface,
                   border: '1px solid rgba(255,255,255,0.06)',
                   borderRadius: 16,
-                  padding: 24,
+                  padding: 28,
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
+                  transition: 'border-color 300ms ease, box-shadow 300ms ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(230,57,70,0.3)'
+                  e.currentTarget.style.boxShadow = '0 0 30px rgba(230,57,70,0.08)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+                  e.currentTarget.style.boxShadow = 'none'
                 }}
               >
-                <span style={{ fontSize: 14 }}>⭐⭐⭐⭐⭐</span>
+                <MessageCircle size={24} color={T.accent} style={{ opacity: 0.6 }} />
                 <p
                   style={{
                     fontSize: 15,
-                    color: 'rgba(255,255,255,0.75)',
+                    color: 'rgba(255,255,255,0.8)',
                     fontStyle: 'italic',
                     lineHeight: 1.7,
-                    marginTop: 12,
+                    marginTop: 16,
                     flex: 1,
                   }}
                 >
                   &ldquo;{t.text}&rdquo;
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16 }}>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: `linear-gradient(135deg, ${T.accent}, rgba(230,57,70,0.6))`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#FFFFFF',
-                      fontSize: 13,
-                      fontWeight: 700,
-                    }}
-                  >
-                    {t.initials}
-                  </div>
-                  <div>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: T.textPrimary }}>
-                      {t.name}
-                    </p>
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{t.restaurant}</p>
-                  </div>
+                <div style={{ display: 'flex', gap: 2, marginTop: 16 }}>
+                  {[...Array(5)].map((_, si) => (
+                    <Star key={si} size={14} color={T.accent} fill={T.accent} />
+                  ))}
+                </div>
+                <div style={{ marginTop: 12 }}>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: T.textPrimary }}>
+                    {t.name}
+                  </p>
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                    {t.restaurant}
+                  </p>
                 </div>
               </div>
+            </AnimatedSection>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION — STATS COUNTER
+   ═══════════════════════════════════════════════════════════ */
+function StatCounter({ target, suffix, label, duration = 2000, formatter }: { target: number; suffix: string; label: string; duration?: number; formatter?: (n: number) => string }) {
+  const { count, ref } = useCountUp(target, duration)
+  return (
+    <div ref={ref} style={{ textAlign: 'center', padding: '20px 16px' }}>
+      <div
+        style={{
+          fontSize: 'clamp(32px, 5vw, 48px)',
+          fontWeight: 800,
+          color: T.accent,
+          letterSpacing: '-0.03em',
+          lineHeight: 1,
+        }}
+      >
+        {formatter ? formatter(count) : count}{suffix}
+      </div>
+      <p
+        style={{
+          fontSize: 14,
+          color: T.textSecondary,
+          marginTop: 8,
+          lineHeight: 1.5,
+        }}
+      >
+        {label}
+      </p>
+    </div>
+  )
+}
+
+function StatsCounterSection() {
+  const stats = [
+    { target: 50, suffix: '+', label: 'Restaurants using MenuMate' },
+    { target: 10000, suffix: '+', label: 'Orders processed' },
+    { target: 999, suffix: '%', label: 'Uptime', duration: 2500, formatter: (n: number) => (n / 10).toFixed(1) },
+    { target: 24, suffix: 'hr', label: 'Setup time' },
+  ]
+
+  return (
+    <section
+      style={{
+        background: `radial-gradient(ellipse at center, ${T.accentGlow} 0%, transparent 70%), ${T.surface}`,
+        padding: '80px clamp(16px, 4vw, 40px)',
+      }}
+    >
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        <AnimatedSection>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <SectionLabel text="BY THE NUMBERS" />
+            <h2
+              style={{
+                fontSize: 'clamp(28px, 4vw, 40px)',
+                fontWeight: 800,
+                color: T.textPrimary,
+                marginTop: 12,
+                letterSpacing: '-0.03em',
+              }}
+            >
+              Trusted by restaurants across Surat
+            </h2>
+          </div>
+        </AnimatedSection>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+            gap: 24,
+          }}
+        >
+          {stats.map((s, i) => (
+            <AnimatedSection key={i} delay={i * 100}>
+              <div
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: 16,
+                  padding: '28px 16px',
+                }}
+              >
+                <StatCounter target={s.target} suffix={s.suffix} label={s.label} duration={s.duration} formatter={s.formatter} />
+              </div>
+            </AnimatedSection>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION — FAQ
+   ═══════════════════════════════════════════════════════════ */
+function FAQItem({ question, answer }: { question: string; answer: string }) {
+  const [open, setOpen] = useState(false)
+  const [maxH, setMaxH] = useState(0)
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (open && contentRef.current) {
+      setMaxH(contentRef.current.scrollHeight)
+    }
+  }, [open])
+
+  return (
+    <div
+      style={{
+        background: T.surface,
+        border: `1px solid ${open ? 'rgba(230,57,70,0.2)' : 'rgba(255,255,255,0.06)'}`,
+        borderRadius: 12,
+        overflow: 'hidden',
+        transition: 'border-color 200ms ease',
+      }}
+    >
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 16,
+          padding: '20px 24px',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          textAlign: 'left',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 16,
+            fontWeight: 600,
+            color: T.textPrimary,
+            lineHeight: 1.4,
+          }}
+        >
+          {question}
+        </span>
+        <ChevronDown
+          size={20}
+          color={T.textSecondary}
+          style={{
+            flexShrink: 0,
+            transition: 'transform 300ms ease',
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+          }}
+        />
+      </button>
+      <div
+        style={{
+          maxHeight: open ? maxH : 0,
+          overflow: 'hidden',
+          transition: 'max-height 300ms ease',
+        }}
+      >
+        <div ref={contentRef} style={{ padding: '0 24px 20px' }}>
+          <p
+            style={{
+              fontSize: 14,
+              color: T.textSecondary,
+              lineHeight: 1.7,
+            }}
+          >
+            {answer}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function FAQSection() {
+  const faqs = [
+    {
+      question: 'How does MenuMate work?',
+      answer: 'Customers scan your unique QR code, browse your digital menu on their phone, and place an order. You receive the order instantly on WhatsApp.',
+    },
+    {
+      question: 'Do I need any hardware?',
+      answer: 'No! Just a phone with WhatsApp. We handle everything else — hosting, menu updates, order management.',
+    },
+    {
+      question: 'How long does setup take?',
+      answer: 'We can have your restaurant live within 24 hours. Just send us your menu and we do the rest.',
+    },
+    {
+      question: 'What if my menu changes?',
+      answer: 'Update your menu anytime from the dashboard — changes go live instantly. No reprinting, no cost.',
+    },
+    {
+      question: 'Is there a free trial?',
+      answer: 'Yes! Start with our BASIC plan for free. Upgrade to PRO anytime for advanced features like loyalty stamps and analytics.',
+    },
+    {
+      question: 'How do I get paid?',
+      answer: 'Customers pay directly at your restaurant. MenuMate handles the ordering — you keep 100% of your revenue. Zero commission.',
+    },
+  ]
+
+  return (
+    <section id="faq" style={{ background: T.bg, padding: '80px clamp(16px, 4vw, 40px)' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto' }}>
+        <AnimatedSection>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <SectionLabel text="FAQ" />
+            <h2
+              style={{
+                fontSize: 'clamp(28px, 4vw, 40px)',
+                fontWeight: 800,
+                color: T.textPrimary,
+                marginTop: 12,
+                letterSpacing: '-0.03em',
+              }}
+            >
+              Frequently asked questions
+            </h2>
+            <p style={{ fontSize: 16, color: T.textSecondary, marginTop: 8 }}>
+              Everything you need to know about MenuMate
+            </p>
+          </div>
+        </AnimatedSection>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {faqs.map((faq, i) => (
+            <AnimatedSection key={i} delay={i * 60}>
+              <FAQItem question={faq.question} answer={faq.answer} />
             </AnimatedSection>
           ))}
         </div>
@@ -1958,79 +2215,184 @@ I want to get started with MenuMate.`
    SECTION 10 — FOOTER
    ═══════════════════════════════════════════════════════════ */
 function FooterSection() {
+  const footerLinks = [
+    { label: 'How it Works', href: '#how-it-works' },
+    { label: 'Features', href: '#features' },
+    { label: 'Pricing', href: '#pricing' },
+    { label: 'FAQ', href: '#faq' },
+  ]
+
   return (
     <footer
       style={{
         background: '#080808',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        padding: '40px',
+        borderTop: '1px solid transparent',
+        borderImage: 'linear-gradient(90deg, transparent, rgba(230,57,70,0.3), transparent) 1',
+        padding: '60px clamp(16px, 4vw, 40px) 32px',
       }}
     >
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: '0 auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 24,
-        }}
-      >
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div
-          className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6"
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 24,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+            gap: 40,
+            marginBottom: 40,
           }}
         >
-          {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <UtensilsCrossed size={18} color={T.accent} strokeWidth={2.2} />
-            <span style={{ fontWeight: 700, fontSize: 16, color: T.textPrimary }}>
-              MenuMate
-            </span>
-            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginLeft: 8 }}>
-              Digital menus for Indian restaurants
-            </span>
+          {/* Logo & Tagline */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <UtensilsCrossed size={20} color={T.accent} strokeWidth={2.2} />
+              <span style={{ fontWeight: 700, fontSize: 18, color: T.textPrimary, letterSpacing: '-0.03em' }}>
+                MenuMate
+              </span>
+            </div>
+            <p style={{ fontSize: 14, color: T.textSecondary, lineHeight: 1.6 }}>
+              Digital menus that sell
+            </p>
           </div>
 
-          {/* Location */}
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>
-            Surat, Gujarat 🇮🇳
-          </span>
+          {/* Navigation */}
+          <div>
+            <h4 style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
+              Navigation
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {footerLinks.map((l) => (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  style={{
+                    fontSize: 14,
+                    color: T.textSecondary,
+                    textDecoration: 'none',
+                    transition: 'color 150ms',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = T.textPrimary)}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = T.textSecondary)}
+                >
+                  {l.label}
+                </a>
+              ))}
+            </div>
+          </div>
 
-          {/* WhatsApp */}
-          <button
-            onClick={() => window.open(waLink('Hi MenuMate!'), '_blank')}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 13,
-              color: T.waGreen,
-              fontWeight: 500,
-              textDecoration: 'none',
-              padding: 0,
-            }}
-          >
-            Chat with us
-          </button>
+          {/* Contact */}
+          <div>
+            <h4 style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
+              Contact
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button
+                onClick={() => window.open(waLink('Hi MenuMate!'), '_blank')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 14,
+                  color: T.waGreen,
+                  fontWeight: 500,
+                  padding: 0,
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  transition: 'opacity 150ms',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill={T.waGreen}>
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+                WhatsApp Us
+              </button>
+              <a
+                href="mailto:hello@menumate.in"
+                style={{
+                  fontSize: 14,
+                  color: T.textSecondary,
+                  textDecoration: 'none',
+                  transition: 'color 150ms',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = T.textPrimary)}
+                onMouseLeave={(e) => (e.currentTarget.style.color = T.textSecondary)}
+              >
+                hello@menumate.in
+              </a>
+            </div>
+          </div>
         </div>
+
+        {/* Divider */}
+        <div
+          style={{
+            height: 1,
+            background: 'rgba(255,255,255,0.06)',
+            marginBottom: 24,
+          }}
+        />
 
         {/* Copyright */}
         <p
           style={{
             textAlign: 'center',
-            fontSize: 12,
-            color: 'rgba(255,255,255,0.2)',
+            fontSize: 13,
+            color: 'rgba(255,255,255,0.25)',
           }}
         >
-          © {new Date().getFullYear()} MenuMate. Built in Surat.
+          © 2024 MenuMate. All rights reserved.
         </p>
       </div>
     </footer>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLL TO TOP BUTTON
+   ═══════════════════════════════════════════════════════════ */
+function ScrollToTopButton() {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => {
+      setVisible(window.scrollY > 400)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  if (!visible) return null
+
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      aria-label="Scroll to top"
+      style={{
+        position: 'fixed',
+        bottom: 24,
+        right: 24,
+        zIndex: 50,
+        width: 44,
+        height: 44,
+        borderRadius: '50%',
+        background: T.accent,
+        border: 'none',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 4px 20px rgba(230,57,70,0.4)',
+        transition: 'transform 200ms ease, opacity 200ms ease',
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(10px)',
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+    >
+      <ArrowUp size={20} color="#FFFFFF" />
+    </button>
   )
 }
 
@@ -2048,8 +2410,11 @@ export default function LandingPage() {
       <FeaturesSection />
       <PricingSection />
       <TestimonialsSection />
+      <StatsCounterSection />
+      <FAQSection />
       <InquiryForm />
       <FooterSection />
+      <ScrollToTopButton />
     </div>
   )
 }
