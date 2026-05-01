@@ -228,6 +228,35 @@
   animation: cookieSlideUp 0.4s ease-out forwards;
 }
 
+/* ── Critical scroll/interaction rules (OUTSIDE @layer for highest specificity) ── */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  min-height: 100%;
+  /* Allow content to grow beyond viewport for scrolling */
+  height: auto !important;
+}
+
+@supports (height: 100dvh) {
+  html {
+    min-height: 100dvh;
+  }
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  max-width: 100%;
+  /* Ensure body takes at least full viewport height but can grow */
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto !important;
+  position: relative;
+}
+
 @layer base {
   *, *::before, *::after {
     @apply border-border outline-ring/50;
@@ -235,16 +264,9 @@
   }
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
-    overflow-y: auto;
   }
   body {
     @apply bg-background text-foreground;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-    overflow-y: auto;
-    max-width: 100%;
   }
   ::selection {
     background-color: rgba(230, 57, 70, 0.3);

@@ -541,6 +541,8 @@ function HeroSection() {
         position: 'relative',
         overflow: 'hidden',
         touchAction: 'pan-y',
+        /* Ensure this section doesn't prevent page-level scrolling */
+        overscrollBehavior: 'contain',
       }}
     >
       <div className="mesh-orb-1" />
@@ -1705,6 +1707,271 @@ function RestaurantShowcaseSection() {
                 <span style={{ color: '#FFFFFF', fontSize: 10, fontWeight: 600 }}>View Cart →</span>
               </div>
             </div>
+          </div>
+        </AnimatedSection>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION — TRUSTED BY (Partner logos marquee)
+   ═══════════════════════════════════════════════════════════ */
+function TrustedBySection() {
+  const partners = [
+    'Brew House Cafe', 'The Spice Kitchen', 'Pizza Planet',
+    'Royal Dining', 'Cafe Milano', 'Surat Biryani House',
+    'Chai & Co.', 'Green Bowl', 'Urban Tadka',
+    'Masala Trail', 'Coastal Catch', 'Dessert Den',
+  ]
+  // Double the list for seamless loop
+  const doubled = [...partners, ...partners]
+
+  return (
+    <section style={{ background: T.sectionAlt, padding: '48px 0', overflow: 'hidden' }}>
+      <AnimatedSection>
+        <p style={{
+          textAlign: 'center',
+          fontSize: 13,
+          fontWeight: 600,
+          color: T.textMuted,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+          marginBottom: 28,
+        }}>
+          Trusted by restaurants across Gujarat
+        </p>
+      </AnimatedSection>
+      <div style={{
+        position: 'relative',
+        maskImage: 'linear-gradient(90deg, transparent, black 10%, black 90%, transparent)',
+        WebkitMaskImage: 'linear-gradient(90deg, transparent, black 10%, black 90%, transparent)',
+      }}>
+        <div className="marquee-track" style={{
+          display: 'flex',
+          gap: 48,
+          animation: 'marqueeScroll 30s linear infinite',
+          width: 'max-content',
+        }}>
+          {doubled.map((name, i) => (
+            <div key={i} style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              padding: '10px 20px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.05)',
+              borderRadius: 100,
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}>
+              <div style={{
+                width: 28,
+                height: 28,
+                borderRadius: 8,
+                background: `linear-gradient(135deg, ${T.accent}20, ${T.accent}08)`,
+                border: `1px solid ${T.accent}30`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 14,
+              }}>
+                🍽️
+              </div>
+              <span style={{ fontSize: 14, fontWeight: 500, color: T.textSecondary }}>{name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION — COMPARISON TABLE (MenuMate vs Competition)
+   ═══════════════════════════════════════════════════════════ */
+function ComparisonSection() {
+  const features = [
+    { feature: 'Commission per order', menumate: '0%', zomato: '20-25%', swiggy: '18-25%', printed: '—' },
+    { feature: 'Setup time', menumate: '24 hours', zomato: '2-3 weeks', swiggy: '2-3 weeks', printed: '2-3 days' },
+    { feature: 'Menu updates', menumate: 'Instant (free)', zomato: '24-48 hrs', swiggy: '24-48 hrs', printed: '₹5,000+ reprint' },
+    { feature: 'Customer data', menumate: '✓ You own it', zomato: '✗ Zomato owns', swiggy: '✗ Swiggy owns', printed: '—' },
+    { feature: 'WhatsApp orders', menumate: '✓ Direct', zomato: '✗ App only', swiggy: '✗ App only', printed: '✗' },
+    { feature: 'Loyalty program', menumate: '✓ Built-in', zomato: '✗', swiggy: '✗', printed: '✗' },
+    { feature: 'QR per table', menumate: '✓', zomato: '✗', swiggy: '✗', printed: '✗' },
+    { feature: 'Monthly cost', menumate: '₹999-1,499', zomato: '₹0 + commission', swiggy: '₹0 + commission', printed: '₹0 + reprint' },
+  ]
+
+  const cellStyle: React.CSSProperties = {
+    padding: '12px 16px',
+    fontSize: 13,
+    lineHeight: 1.4,
+    borderBottom: '1px solid rgba(255,255,255,0.05)',
+  }
+
+  return (
+    <section style={{ background: T.bg, padding: '80px clamp(16px, 5vw, 40px)' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <AnimatedSection>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <SectionLabel text="COMPARE" />
+            <h2 style={{
+              fontSize: 'clamp(28px, 4vw, 40px)',
+              fontWeight: 800,
+              color: T.textPrimary,
+              marginTop: 12,
+              letterSpacing: '-0.03em',
+            }}>
+              Why restaurants choose MenuMate
+            </h2>
+            <p style={{ fontSize: 16, color: T.textSecondary, marginTop: 8 }}>
+              See how we compare to other ordering solutions
+            </p>
+          </div>
+        </AnimatedSection>
+
+        <AnimatedSection delay={150}>
+          <div style={{
+            borderRadius: 16,
+            overflow: 'hidden',
+            border: '1px solid rgba(255,255,255,0.08)',
+            background: T.surface,
+          }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+                <thead>
+                  <tr>
+                    <th style={{ ...cellStyle, textAlign: 'left', fontWeight: 600, color: T.textMuted, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', background: 'rgba(255,255,255,0.02)' }}>Feature</th>
+                    <th style={{ ...cellStyle, textAlign: 'center', fontWeight: 700, color: T.accent, fontSize: 13, background: 'rgba(230,57,70,0.06)', borderBottom: '2px solid rgba(230,57,70,0.3)' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                        <UtensilsCrossed size={16} color={T.accent} />
+                        MenuMate
+                      </div>
+                    </th>
+                    <th style={{ ...cellStyle, textAlign: 'center', fontWeight: 500, color: T.textMuted, fontSize: 13, background: 'rgba(255,255,255,0.01)' }}>Zomato</th>
+                    <th style={{ ...cellStyle, textAlign: 'center', fontWeight: 500, color: T.textMuted, fontSize: 13, background: 'rgba(255,255,255,0.01)' }}>Swiggy</th>
+                    <th style={{ ...cellStyle, textAlign: 'center', fontWeight: 500, color: T.textMuted, fontSize: 13, background: 'rgba(255,255,255,0.01)' }}>Printed Menu</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {features.map((row, i) => (
+                    <tr key={i} style={{ transition: 'background 150ms' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.02)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <td style={{ ...cellStyle, color: T.textPrimary, fontWeight: 500 }}>{row.feature}</td>
+                      <td style={{ ...cellStyle, textAlign: 'center', color: T.accent, fontWeight: 600, background: 'rgba(230,57,70,0.03)' }}>{row.menumate}</td>
+                      <td style={{ ...cellStyle, textAlign: 'center', color: T.textSecondary }}>{row.zomato}</td>
+                      <td style={{ ...cellStyle, textAlign: 'center', color: T.textSecondary }}>{row.swiggy}</td>
+                      <td style={{ ...cellStyle, textAlign: 'center', color: T.textSecondary }}>{row.printed}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </AnimatedSection>
+
+        <AnimatedSection delay={300}>
+          <div style={{
+            marginTop: 24,
+            textAlign: 'center',
+            background: 'rgba(52,199,89,0.06)',
+            border: '1px solid rgba(52,199,89,0.15)',
+            borderRadius: 12,
+            padding: '14px 20px',
+          }}>
+            <span style={{ color: T.green, fontWeight: 600, fontSize: 14 }}>
+              💰 Save ₹50,000+ per year on commissions with MenuMate vs Zomato/Swiggy
+            </span>
+          </div>
+        </AnimatedSection>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION — CTA BANNER (Mid-page conversion)
+   ═══════════════════════════════════════════════════════════ */
+function CTABanner() {
+  return (
+    <section style={{
+      background: `linear-gradient(135deg, rgba(230,57,70,0.12) 0%, rgba(230,57,70,0.04) 100%), ${T.bg}`,
+      padding: '64px clamp(16px, 5vw, 40px)',
+      borderTop: '1px solid rgba(230,57,70,0.1)',
+      borderBottom: '1px solid rgba(230,57,70,0.1)',
+    }}>
+      <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
+        <AnimatedSection>
+          <h2 style={{
+            fontSize: 'clamp(24px, 4vw, 36px)',
+            fontWeight: 800,
+            color: T.textPrimary,
+            letterSpacing: '-0.03em',
+          }}>
+            Ready to ditch commissions?
+          </h2>
+          <p style={{
+            fontSize: 16,
+            color: T.textSecondary,
+            marginTop: 12,
+            lineHeight: 1.6,
+            maxWidth: 500,
+            margin: '12px auto 0',
+          }}>
+            Join 50+ Surat restaurants that own their customers, keep 100% revenue, and never pay commission again.
+          </p>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12,
+            marginTop: 28,
+            flexWrap: 'wrap',
+          }}>
+            <button
+              onClick={() => window.open(waLink('Hi, I want to start with MenuMate!'), '_blank')}
+              style={{
+                background: T.accent,
+                color: '#FFFFFF',
+                padding: '14px 28px',
+                borderRadius: 100,
+                fontWeight: 600,
+                fontSize: 15,
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 0 30px rgba(230,57,70,0.35)',
+                transition: 'filter 150ms, transform 150ms',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.filter = 'brightness(1.1)'
+                e.currentTarget.style.transform = 'translateY(-2px)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.filter = 'brightness(1)'
+                e.currentTarget.style.transform = 'translateY(0)'
+              }}
+            >
+              Start Free Trial →
+            </button>
+            <a
+              href="#pricing"
+              style={{
+                padding: '14px 28px',
+                borderRadius: 100,
+                fontWeight: 600,
+                fontSize: 15,
+                border: `1px solid ${T.btnGhostBorder}`,
+                color: T.textPrimary,
+                textDecoration: 'none',
+                transition: 'background 150ms',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = T.btnGhostHover)}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            >
+              See Pricing
+            </a>
           </div>
         </AnimatedSection>
       </div>
@@ -3050,10 +3317,13 @@ export default function LandingPage() {
     <div style={{ background: T.bg, color: T.textPrimary }}>
       <Navbar />
       <HeroSection />
+      <TrustedBySection />
       <ProblemSolutionSection />
       <HowItWorksSection />
       <DemoSection />
       <FeaturesSection />
+      <ComparisonSection />
+      <CTABanner />
       <RestaurantShowcaseSection />
       <PricingSection />
       <TestimonialsSection />
@@ -3065,6 +3335,15 @@ export default function LandingPage() {
       <CookieConsent />
 
       <style jsx global>{`
+        /* ── Marquee scroll animation ── */
+        @keyframes marqueeScroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .marquee-track:hover {
+          animation-play-state: paused;
+        }
+
         /* ── Stat counter pulse (bounce) ── */
         @keyframes statPulse {
           0% { transform: scale(1); }

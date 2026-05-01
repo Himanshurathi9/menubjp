@@ -142,6 +142,8 @@ html {
   overflow-y: auto;
   scroll-behavior: smooth;
   min-height: 100%;
+  /* CRITICAL: height must be 'auto', never '100%' or '100vh' — otherwise page can't scroll */
+  height: auto;
 }
 
 /* Fix iOS Safari 100vh bug — use 100dvh with fallback */
@@ -160,6 +162,11 @@ body {
   color: var(--text-primary);
   background: var(--background);
   overscroll-behavior-y: contain;
+  /* CRITICAL: body must be scrollable and auto-height */
+  overflow-y: auto;
+  min-height: 100vh;
+  height: auto;
+  position: relative;
 }
 
 /* ═══════════════════════════════════════════════════════════════
