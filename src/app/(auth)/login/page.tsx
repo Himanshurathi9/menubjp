@@ -91,7 +91,6 @@ export default function LoginPage() {
           background: 'linear-gradient(135deg, #0A0A0A 0%, #1A0A08 100%)',
           position: 'relative',
           overflow: 'hidden',
-          display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           padding: 60,
@@ -207,11 +206,12 @@ export default function LoginPage() {
           justifyContent: 'center',
           padding: '40px 20px',
           minHeight: '100dvh',
+          boxSizing: 'border-box',
         }}
       >
         <div
           className="animate-page-enter animate-page-enter-1"
-          style={{ width: '100%', maxWidth: 380 }}
+          style={{ width: '100%', maxWidth: 380, boxSizing: 'border-box' }}
         >
           {/* Mobile-only logo */}
           <div

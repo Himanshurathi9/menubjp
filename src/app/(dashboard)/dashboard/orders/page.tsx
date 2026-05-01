@@ -394,6 +394,7 @@ function OrderCard({
         <div className="flex items-center justify-between" style={{ marginTop: 14 }}>
           {/* Price */}
           <span
+            className="flex-shrink-0"
             style={{
               fontSize: 18,
               fontWeight: 800,
@@ -410,11 +411,11 @@ function OrderCard({
             <button
               onClick={(e) => { e.stopPropagation(); handleAction() }}
               disabled={updating}
-              className="flex items-center justify-center animate-btn-press"
+              className="flex items-center justify-center animate-btn-press flex-shrink-0"
               style={{
                 height: 36,
                 borderRadius: 100,
-                padding: '0 18px',
+                padding: '0 14px',
                 fontSize: 13,
                 fontWeight: 700,
                 background: nextConfig.gradient,
@@ -595,9 +596,10 @@ export default function OrdersPage() {
         </div>
 
         {/* Right: updated text + refresh button */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {lastUpdatedText && (
             <span
+              className="hidden sm:inline truncate max-w-[100px]"
               style={{
                 fontSize: 12,
                 color: 'var(--dash-text-3)',
@@ -659,9 +661,9 @@ export default function OrdersPage() {
               <button
                 key={tabStatus}
                 onClick={() => setActiveTab(tabStatus)}
-                className="flex-1 flex items-center justify-center gap-1.5 animate-btn-press"
+                className="flex-1 flex items-center justify-center gap-1 animate-btn-press min-w-0"
                 style={{
-                  padding: '9px 4px',
+                  padding: '9px 2px',
                   borderRadius: 10,
                   textAlign: 'center',
                   fontSize: 13,
@@ -709,10 +711,12 @@ export default function OrdersPage() {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
+            overflow: 'hidden',
           }}
         >
-          <span className="dash-section-label">TODAY</span>
+          <span className="dash-section-label flex-shrink-0">TODAY</span>
           <span
+            className="truncate"
             style={{
               fontSize: 13,
               fontWeight: 600,
@@ -722,10 +726,11 @@ export default function OrdersPage() {
             {data.totalToday} orders
           </span>
           <div
-            className="dash-separator"
+            className="dash-separator flex-shrink-0"
             style={{ width: 1, height: 12, margin: '0 4px' }}
           />
           <span
+            className="truncate"
             style={{
               fontSize: 13,
               fontWeight: 600,

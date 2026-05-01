@@ -100,3 +100,30 @@ Stage Summary:
 - No existing sections modified (Navbar, Hero, Problem/Solution, How It Works, Demo, Features, Pricing all untouched except Navbar links array)
 - New sections: Testimonials, Stats Counter, FAQ (accordion), Footer, Scroll-to-Top button
 - FAQ nav link added to navbar
+
+---
+
+Task ID: 3
+Agent: Main Agent
+Task: Fix ALL mobile responsiveness issues across the entire app (320px-480px)
+
+Work Log:
+- Audited all pages and components for mobile responsiveness issues
+- Identified key problems: fixed paddings (80px 40px), fixed widths (280px phone mockup), features grid requiring 280px min, login left panel display conflict, missing overflow protection
+- Fixed global CSS: Added `overflow-x: hidden` to html and body, `max-width: 100vw` on body, `box-sizing: border-box` on all elements
+- Fixed landing page (page.tsx): 23 responsive changes including responsive section padding, phone mockup width, features grid, hero badge/buttons, hero section overflow, browser chrome overflow, pricing/inquiry card padding
+- Fixed login page (login/page.tsx): Removed `display: 'flex'` from left panel inline style (was overriding Tailwind `hidden` class), added `boxSizing: 'border-box'` to right panel and form container
+- Fixed menu CSS (menu-themes.css): Added `@media (max-width: 360px)` block with responsive rules for service bar, cart sheet, category pills, menu cards, banner slider, and header
+- Fixed public menu client (PublicMenuClient.tsx): Responsive header padding, tab button sizing with flexShrink/minWidth, icon gap reduction, proper bottom padding with safe-area-inset, reduced bottom spacer
+- Fixed cart sheet (CartSheet.tsx): Responsive horizontal padding using `clamp(14px, 5vw, 20px)` on all content sections, cart item rows, totals, and CTA button area
+- Fixed dashboard pages: Bottom nav responsive (design-system.css), dashboard page header/stats/subscription text overflow, menu page sheet padding and badge wrapping, orders page tab/text overflow, settings page padding reduction, banners page padding/gap reduction
+- Verified all pages compile and serve (200 OK) — Landing page 114KB, Login page 31KB
+- No lint errors introduced in modified files
+
+Stage Summary:
+- All pages now responsive from 320px to 480px width
+- Zero horizontal scroll on any page
+- All buttons visible and clickable on mobile
+- Cart sheet and service bar properly sized on small screens
+- Login left panel correctly hidden on mobile
+- Design, colors, and UI structure unchanged — only layout/responsiveness fixes

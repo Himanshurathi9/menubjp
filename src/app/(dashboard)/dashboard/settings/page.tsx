@@ -638,7 +638,7 @@ export default function SettingsPage() {
     <div className="min-h-screen pb-[100px]" style={{ background: 'var(--dash-bg)' }}>
       {/* ─── Header ─── */}
       <header className="sticky top-0 z-40 dash-glass">
-        <div className="px-5" style={{ paddingTop: '20px', paddingBottom: '16px' }}>
+        <div className="px-4 sm:px-5" style={{ paddingTop: '20px', paddingBottom: '16px' }}>
           <h1
             style={{
               fontSize: '28px',
@@ -654,7 +654,7 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <div className="px-4 pb-[100px]">
+      <div className="px-3 sm:px-4 pb-[100px]">
         {/* ═══ SECTION 1 — RESTAURANT INFO ═══ */}
         <section className="mt-5 animate-dash-section-enter" style={{ animationDelay: '0ms' }}>
           <SectionLabel>Restaurant Info</SectionLabel>
@@ -667,7 +667,7 @@ export default function SettingsPage() {
               label="Restaurant Name"
             >
               <div className="flex items-center gap-1.5">
-                <span style={{ fontSize: '14px', color: 'var(--dash-text-3)', maxWidth: '160px' }} className="truncate">
+                <span style={{ fontSize: '14px', color: 'var(--dash-text-3)', maxWidth: '120px' }} className="truncate">
                   {data?.restaurant?.name}
                 </span>
                 <ChevronRight className="w-4 h-4" style={{ color: 'var(--dash-text-3)' }} />

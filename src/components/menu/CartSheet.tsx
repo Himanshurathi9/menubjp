@@ -205,7 +205,7 @@ export default function CartSheet({
 
         {/* ═══ SUCCESS STATE ═══ */}
         {result ? (
-          <div style={{ padding: '36px 24px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ padding: '36px clamp(16px, 5vw, 24px) 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <AnimatedCheck />
 
             <span
@@ -287,7 +287,7 @@ export default function CartSheet({
         ) : (
           <>
             {/* ── Header ── */}
-            <div style={{ padding: '16px 20px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ padding: '16px clamp(14px, 5vw, 20px) 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--m-text)' }}>Your Order</span>
                 {cartCount > 0 && (
@@ -309,7 +309,7 @@ export default function CartSheet({
             </div>
 
             {restaurantName && (
-              <div style={{ padding: '0 20px 4px', fontSize: '12px', color: 'var(--m-text-muted)' }}>
+              <div style={{ padding: '0 clamp(14px, 5vw, 20px) 4px', fontSize: '12px', color: 'var(--m-text-muted)' }}>
                 {restaurantName}
                 {tableNumber && <span style={{ marginLeft: '6px', color: 'var(--m-text-secondary)', fontWeight: 600 }}>Table {tableNumber}</span>}
               </div>
@@ -318,7 +318,7 @@ export default function CartSheet({
             {/* ── Error ── */}
             {error && (
               <div style={{
-                margin: '8px 20px 0', padding: '10px 14px',
+                margin: '8px clamp(14px, 5vw, 20px) 0', padding: '10px 14px',
                 background: 'var(--m-error-soft)', borderRadius: '12px',
                 fontSize: '13px', color: 'var(--m-error)', fontWeight: 500,
               }}>
@@ -336,7 +336,7 @@ export default function CartSheet({
               ) : (
                 <>
                   {cart.map((item) => (
-                    <div key={item.menuItemId} className="menu-sheet-item">
+                    <div key={item.menuItemId} className="menu-sheet-item" style={{ padding: '12px clamp(14px, 5vw, 20px)' }}>
                       <FoodDot type={item.foodType} />
                       <span className="menu-sheet-item-name">{item.name}</span>
                       <div className="menu-sheet-qty">
@@ -349,7 +349,7 @@ export default function CartSheet({
                   ))}
 
                   {/* ── Note ── */}
-                  <div style={{ padding: '12px 20px 4px' }}>
+                  <div style={{ padding: '12px clamp(14px, 5vw, 20px) 4px' }}>
                     <textarea
                       className="menu-sheet-note"
                       value={note}
@@ -365,19 +365,19 @@ export default function CartSheet({
             {/* ── Total + CTA ── */}
             {cart.length > 0 && (
               <>
-                <div style={{ padding: '8px 20px 4px', borderTop: '1px solid var(--m-card-border)' }}>
+                <div style={{ padding: '8px clamp(14px, 5vw, 20px) 4px', borderTop: '1px solid var(--m-card-border)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--m-text-secondary)' }}>
                     <span>Item Total</span>
                     <span>{formatPrice(cartTotal)}</span>
                   </div>
                 </div>
-                <div style={{ padding: '4px 20px' }}>
+                <div style={{ padding: '4px clamp(14px, 5vw, 20px)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 800, color: 'var(--m-text)' }}>
                     <span>Total</span>
                     <span>{formatPrice(cartTotal)}</span>
                   </div>
                 </div>
-                <div style={{ padding: '8px 20px 28px' }}>
+                <div style={{ padding: '8px clamp(14px, 5vw, 20px) 28px' }}>
                   <button
                     className="menu-sheet-order-btn"
                     onClick={handlePlaceOrder}

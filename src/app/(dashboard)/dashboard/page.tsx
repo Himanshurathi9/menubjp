@@ -198,7 +198,7 @@ export default function DashboardPage() {
         {/* Right: Restaurant name pill */}
         {restaurant && (
           <span
-            className="text-[11px] font-semibold truncate max-w-[180px] px-3 py-1"
+            className="text-[11px] font-semibold truncate max-w-[140px] sm:max-w-[180px] px-3 py-1"
             style={{
               color: 'var(--dash-text-2)',
               background: 'rgba(255,255,255,0.05)',
@@ -256,13 +256,16 @@ export default function DashboardPage() {
                 </span>
               </div>
               <h1
-                className="mt-1"
+                className="mt-1 truncate max-w-full"
                 style={{
                   fontSize: '28px',
                   fontWeight: 800,
                   color: 'var(--dash-text)',
                   letterSpacing: '-0.03em',
                   lineHeight: 1.1,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {restaurant.name}
@@ -374,7 +377,7 @@ export default function DashboardPage() {
               style={{ marginTop: '14px' }}
             >
               {/* Today's Orders Card */}
-              <div className="dash-card dash-card-accent" style={{ padding: '16px', borderRadius: '16px' }}>
+              <div className="dash-card dash-card-accent overflow-hidden" style={{ padding: '16px', borderRadius: '16px' }}>
                 {/* Blue top accent */}
                 <div
                   style={{
@@ -435,7 +438,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Revenue Card */}
-              <div className="dash-card dash-card-accent" style={{ padding: '16px', borderRadius: '16px' }}>
+              <div className="dash-card dash-card-accent overflow-hidden" style={{ padding: '16px', borderRadius: '16px' }}>
                 {/* Green top accent - uses default gradient from ::before */}
                 <div className="flex items-center gap-2 mb-2">
                   <div
@@ -552,13 +555,14 @@ export default function DashboardPage() {
                 }}
               />
 
-              <div className="relative flex items-center justify-between">
-                <div>
+              <div className="relative flex items-center justify-between gap-2">
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="dash-badge dash-badge-success">
+                    <span className="dash-badge dash-badge-success flex-shrink-0">
                       {restaurant.plan}
                     </span>
                     <span
+                      className="truncate"
                       style={{
                         color: 'var(--dash-text)',
                         fontSize: '15px',
@@ -579,7 +583,7 @@ export default function DashboardPage() {
                   </p>
                 </div>
 
-                <div className="text-right">
+                <div className="text-right flex-shrink-0">
                   {planExpired ? (
                     <>
                       <p style={{ color: 'var(--dash-text-3)', fontSize: '11px' }}>Expires in</p>
@@ -845,7 +849,7 @@ export default function DashboardPage() {
                       Revenue
                     </span>
                   </div>
-                  <span style={{ fontSize: '12px', color: 'var(--dash-text-2)' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--dash-text-2)' }} className="truncate max-w-[140px]">
                     {formatPrice(todayRevenue)} / {formatPrice(revenueTarget)}
                   </span>
                 </div>

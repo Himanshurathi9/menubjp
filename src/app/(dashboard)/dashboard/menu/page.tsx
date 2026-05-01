@@ -118,7 +118,7 @@ function ItemCard({
       }}
     >
       <div
-        className="dash-card flex items-center gap-3.5 cursor-pointer"
+        className="dash-card flex items-center gap-3.5 cursor-pointer overflow-hidden"
         style={{
           borderRadius: '16px',
           padding: '14px',
@@ -201,7 +201,7 @@ function ItemCard({
           </span>
 
           {/* PRO Badges */}
-          <div className="flex gap-1.5 mt-1.5">
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
             {item.is_best_seller && (
               <span
                 className="inline-flex items-center gap-1"
@@ -326,7 +326,7 @@ function ItemSheetInner({
         </div>
 
         {/* Header with X button */}
-        <div className="flex items-center justify-between px-6 pt-2 pb-3 flex-shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 pt-2 pb-3 flex-shrink-0">
           <h3
             style={{ fontSize: '20px', fontWeight: 600, color: 'var(--dash-text)', fontFamily: "var(--font-display)" }}
           >
@@ -343,7 +343,7 @@ function ItemSheetInner({
         </div>
 
         {/* Scrollable form */}
-        <div ref={scrollRef} className="overflow-y-auto flex-1 px-6 pb-4 premium-scroll">
+        <div ref={scrollRef} className="overflow-y-auto flex-1 px-4 sm:px-6 pb-4 premium-scroll">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {/* 1. Image */}
             <ImageUpload
@@ -538,7 +538,7 @@ function ItemSheetInner({
         </div>
 
         {/* Bottom buttons */}
-        <div className="px-6 pb-8 pt-3 flex-shrink-0" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div className="px-4 sm:px-6 pb-8 pt-3 flex-shrink-0" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {mode === 'edit' && (
             <button
               onClick={onDelete}
@@ -605,7 +605,7 @@ function AddCategorySheetInner({
         <div className="flex justify-center pt-3 pb-1">
           <div style={{ width: '36px', height: '4px', borderRadius: '100px', background: 'var(--dash-text-3)', margin: '8px auto' }} />
         </div>
-        <div className="px-6 pb-8 pt-2">
+        <div className="px-4 sm:px-6 pb-8 pt-2">
           <div className="flex items-center justify-between mb-5">
             <h3 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--dash-text)', fontFamily: "var(--font-display)" }}>New Category</h3>
             <button
@@ -668,7 +668,7 @@ function DeleteCategorySheet({ open, onClose, category, onConfirm, loading, hasI
         }}
       >
         <div className="flex justify-center pt-3 pb-1"><div style={{ width: '36px', height: '4px', borderRadius: '100px', background: 'var(--dash-text-3)', margin: '8px auto' }} /></div>
-        <div className="px-6 pb-8 pt-4">
+        <div className="px-4 sm:px-6 pb-8 pt-4">
           <div className="flex flex-col items-center mb-6">
             <div className="w-14 h-14 rounded-full flex items-center justify-center mb-3" style={{ background: 'rgba(239,68,68,0.12)' }}>
               <Trash2 className="w-6 h-6" style={{ color: '#f87171' }} />
@@ -891,11 +891,11 @@ export default function MenuPage() {
           borderBottom: '1px solid var(--dash-border)',
         }}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--dash-text)', letterSpacing: '-0.02em', fontFamily: "var(--font-display)" }}>
             Menu
           </h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Item count badge */}
             {totalItemCount > 0 && (
               <span className="dash-badge" style={{ background: 'var(--dash-surface-2)', color: 'var(--dash-text-2)', border: '1px solid var(--dash-border)', borderRadius: '100px', padding: '4px 12px', fontSize: '12px' }}>

@@ -186,7 +186,7 @@ function Navbar() {
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
-          padding: '0 clamp(16px, 4vw, 40px)',
+          padding: '0 clamp(16px, 5vw, 40px)',
           transition: 'top 0.3s ease',
         }}
       >
@@ -216,7 +216,7 @@ function Navbar() {
           </Link>
 
           {/* Desktop links */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hidden md:flex">
+          <div className="hidden md:flex" style={{ alignItems: 'center', gap: 32 }}>
             {links.map((l) => (
               <a
                 key={l.href}
@@ -236,7 +236,7 @@ function Navbar() {
           </div>
 
           {/* Desktop CTAs */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="hidden md:flex">
+          <div className="hidden md:flex" style={{ alignItems: 'center', gap: 12 }}>
             <Link
               href="/login"
               style={{
@@ -271,13 +271,12 @@ function Navbar() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden"
+            className="flex md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
             style={{
               width: 44,
               height: 44,
-              display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               background: 'none',
@@ -297,7 +296,7 @@ function Navbar() {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="md:hidden"
+          className="flex md:hidden"
           style={{
             position: 'fixed',
             inset: 0,
@@ -305,7 +304,6 @@ function Navbar() {
             background: 'rgba(10,10,10,0.98)',
             backdropFilter: 'blur(20px)',
             padding: '80px 32px 32px',
-            display: 'flex',
             flexDirection: 'column',
             gap: 24,
           }}
@@ -390,11 +388,19 @@ function HeroSection() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: `radial-gradient(ellipse at 50% 0%, ${T.accentGlow} 0%, transparent 60%), ${T.bg}`,
+        background: `
+          radial-gradient(ellipse 80% 50% at 50% -20%, rgba(230,57,70,0.15) 0%, transparent 50%),
+          radial-gradient(ellipse 60% 40% at 80% 50%, rgba(230,57,70,0.08) 0%, transparent 50%),
+          radial-gradient(ellipse 60% 40% at 20% 80%, rgba(52,199,89,0.05) 0%, transparent 50%),
+          ${T.bg}
+        `,
         padding: '100px 24px 60px',
         position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      <div className="mesh-orb-1" />
+      <div className="mesh-orb-2" />
       <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
         {/* Badge */}
         <div
@@ -405,8 +411,9 @@ function HeroSection() {
             background: 'rgba(230,57,70,0.1)',
             border: '1px solid rgba(230,57,70,0.3)',
             borderRadius: 100,
-            padding: '6px 16px',
+            padding: '6px 12px',
             marginBottom: 24,
+            flexWrap: 'wrap',
             ...stagger(0),
           }}
         >
@@ -464,10 +471,10 @@ function HeroSection() {
             style={{
               background: T.accent,
               color: T.textPrimary,
-              padding: '16px 32px',
+              padding: '14px 24px',
               borderRadius: 100,
               fontWeight: 600,
-              fontSize: 16,
+              fontSize: 15,
               border: 'none',
               cursor: 'pointer',
               boxShadow: '0 0 40px rgba(230,57,70,0.35)',
@@ -486,10 +493,10 @@ function HeroSection() {
               background: 'rgba(255,255,255,0.06)',
               border: '1px solid rgba(255,255,255,0.12)',
               color: T.textPrimary,
-              padding: '16px 32px',
+              padding: '14px 24px',
               borderRadius: 100,
               fontWeight: 600,
-              fontSize: 16,
+              fontSize: 15,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -541,7 +548,7 @@ function HeroSection() {
           <div
             className="phone-float"
             style={{
-              width: 280,
+              width: 'min(280px, 70vw)',
               borderRadius: 40,
               overflow: 'hidden',
               background: '#1A1A18',
@@ -802,6 +809,38 @@ function HeroSection() {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-10px); }
         }
+        @keyframes meshFloat1 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -20px) scale(1.1); }
+          66% { transform: translate(-20px, 10px) scale(0.95); }
+        }
+        @keyframes meshFloat2 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(-25px, 15px) scale(1.05); }
+          66% { transform: translate(15px, -25px) scale(1.1); }
+        }
+        .mesh-orb-1 {
+          position: absolute;
+          top: 20%;
+          left: 60%;
+          width: min(400px, 80vw);
+          height: min(400px, 80vw);
+          background: radial-gradient(circle, rgba(230,57,70,0.08) 0%, transparent 70%);
+          border-radius: 50%;
+          animation: meshFloat1 12s ease-in-out infinite;
+          pointer-events: none;
+        }
+        .mesh-orb-2 {
+          position: absolute;
+          bottom: 10%;
+          left: 10%;
+          width: min(350px, 70vw);
+          height: min(350px, 70vw);
+          background: radial-gradient(circle, rgba(52,199,89,0.05) 0%, transparent 70%);
+          border-radius: 50%;
+          animation: meshFloat2 15s ease-in-out infinite;
+          pointer-events: none;
+        }
       `}</style>
     </section>
   )
@@ -829,13 +868,13 @@ function ProblemSolutionSection() {
   ]
 
   return (
-    <section style={{ background: '#0D0D0D', padding: '80px 40px' }}>
+    <section style={{ background: '#0D0D0D', padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <h2
               style={{
-                fontSize: 36,
+                fontSize: 'clamp(28px, 5vw, 36px)',
                 fontWeight: 800,
                 color: T.textPrimary,
                 letterSpacing: '-0.03em',
@@ -946,7 +985,7 @@ function HowItWorksSection() {
   ]
 
   return (
-    <section id="how-it-works" style={{ background: T.bg, padding: '80px 40px' }}>
+    <section id="how-it-works" style={{ background: T.bg, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -1074,7 +1113,7 @@ function DemoSection() {
       id="demo"
       style={{
         background: `radial-gradient(ellipse at center, rgba(230,57,70,0.08) 0%, transparent 70%), #0D0D0D`,
-        padding: '80px 40px',
+        padding: '80px clamp(16px, 5vw, 40px)',
         textAlign: 'center',
       }}
     >
@@ -1213,7 +1252,7 @@ function FeaturesSection() {
   ]
 
   return (
-    <section id="features" style={{ background: T.bg, padding: '80px 40px' }}>
+    <section id="features" style={{ background: T.bg, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -1235,7 +1274,7 @@ function FeaturesSection() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
             gap: 16,
           }}
         >
@@ -1321,6 +1360,157 @@ function FeaturesSection() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   SECTION — RESTAURANT SHOWCASE
+   ═══════════════════════════════════════════════════════════ */
+function RestaurantShowcaseSection() {
+  return (
+    <section style={{ background: '#0D0D0D', padding: '80px clamp(16px, 5vw, 40px)' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto' }}>
+        <AnimatedSection>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <SectionLabel text="SEE THE MAGIC" />
+            <h2
+              style={{
+                fontSize: 'clamp(28px, 4vw, 40px)',
+                fontWeight: 800,
+                color: T.textPrimary,
+                marginTop: 12,
+                letterSpacing: '-0.03em',
+              }}
+            >
+              Your menu, beautifully designed
+            </h2>
+            <p
+              style={{
+                fontSize: 16,
+                color: T.textSecondary,
+                marginTop: 8,
+                lineHeight: 1.6,
+              }}
+            >
+              This is what your customers see — a fast, stunning digital menu that works on every phone
+            </p>
+          </div>
+        </AnimatedSection>
+
+        <AnimatedSection delay={150}>
+          <div style={{
+            maxWidth: 480,
+            margin: '0 auto',
+            borderRadius: 16,
+            overflow: 'hidden',
+            background: '#0B0B0F',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 40px 100px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)',
+          }}>
+            {/* Browser chrome */}
+            <div style={{
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              background: 'rgba(255,255,255,0.03)',
+              overflow: 'hidden',
+            }}>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF5F57' }} />
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FEBC2E' }} />
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#28C840' }} />
+              <div style={{
+                flex: 1,
+                marginLeft: 8,
+                height: 24,
+                borderRadius: 6,
+                background: 'rgba(255,255,255,0.06)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>menumate.in/menu/brew-house</span>
+              </div>
+            </div>
+            {/* Menu content - simplified preview */}
+            <div style={{ padding: 16 }}>
+              {/* Restaurant header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #2D1B0E, #1A0F05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 18 }}>☕</span>
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF' }}>Brew House Cafe</div>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>Open now · Scan to order</div>
+                </div>
+              </div>
+              {/* Category pills */}
+              <div style={{ display: 'flex', gap: 6, marginBottom: 14, overflow: 'hidden' }}>
+                {['All', 'Starters', 'Mains', 'Desserts'].map((c, i) => (
+                  <span key={c} style={{
+                    fontSize: 10,
+                    fontWeight: 600,
+                    padding: '4px 12px',
+                    borderRadius: 100,
+                    background: i === 0 ? 'rgba(230,57,70,0.15)' : 'rgba(255,255,255,0.04)',
+                    color: i === 0 ? '#E63946' : 'rgba(255,255,255,0.4)',
+                    whiteSpace: 'nowrap',
+                    border: i === 0 ? '1px solid rgba(230,57,70,0.3)' : '1px solid transparent',
+                  }}>
+                    {c}
+                  </span>
+                ))}
+              </div>
+              {/* Food grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                {[
+                  { name: 'Truffle Pasta', price: '₹320', emoji: '🍝', bg: 'linear-gradient(145deg, #2D1B0E, #1A0F05)' },
+                  { name: 'Caesar Salad', price: '₹180', emoji: '🥗', bg: 'linear-gradient(145deg, #1B2D1E, #0F1A15)' },
+                  { name: 'Margherita', price: '₹250', emoji: '🍕', bg: 'linear-gradient(145deg, #2D1B2D, #1A0F1A)' },
+                  { name: 'Tiramisu', price: '₹220', emoji: '🧁', bg: 'linear-gradient(145deg, #2D2518, #1A1508)' },
+                ].map((item) => (
+                  <div key={item.name} style={{
+                    borderRadius: 10,
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    overflow: 'hidden',
+                    background: '#111114',
+                  }}>
+                    <div style={{
+                      aspectRatio: '1/1',
+                      background: item.bg,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      <span style={{ fontSize: 28 }}>{item.emoji}</span>
+                    </div>
+                    <div style={{ padding: '6px 8px' }}>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: '#FFFFFF' }}>{item.name}</div>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: '#FFFFFF', marginTop: 1 }}>{item.price}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Cart bar */}
+              <div style={{
+                marginTop: 12,
+                height: 32,
+                background: 'rgba(230,57,70,0.95)',
+                borderRadius: 100,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0 14px',
+              }}>
+                <span style={{ color: '#FFFFFF', fontSize: 10, fontWeight: 600 }}>2 items · ₹500</span>
+                <span style={{ color: '#FFFFFF', fontSize: 10, fontWeight: 600 }}>View Cart →</span>
+              </div>
+            </div>
+          </div>
+        </AnimatedSection>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
    SECTION 7 — PRICING
    ═══════════════════════════════════════════════════════════ */
 function PricingSection() {
@@ -1371,7 +1561,7 @@ function PricingSection() {
   ]
 
   return (
-    <section id="pricing" style={{ background: '#0D0D0D', padding: '80px 40px' }}>
+    <section id="pricing" style={{ background: '#0D0D0D', padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 880, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 16 }}>
@@ -1425,13 +1615,15 @@ function PricingSection() {
               <div
                 style={{
                   background: plan.popular
-                    ? 'linear-gradient(135deg, #1A0A0A, #1A1010)'
-                    : T.surface,
+                    ? 'linear-gradient(135deg, rgba(230,57,70,0.08), rgba(26,16,16,0.95))'
+                    : 'rgba(17,17,17,0.7)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
                   border: plan.popular
                     ? '1px solid rgba(230,57,70,0.3)'
                     : '1px solid rgba(255,255,255,0.08)',
                   borderRadius: 20,
-                  padding: 32,
+                  padding: 'clamp(20px, 5vw, 32px)',
                   position: 'relative',
                   boxShadow: plan.popular ? '0 0 40px rgba(230,57,70,0.1)' : 'none',
                   transition: 'box-shadow 200ms ease',
@@ -1587,21 +1779,27 @@ function TestimonialsSection() {
       text: 'MenuMate changed everything. We get 40+ orders daily through QR now. No more wrong orders!',
       name: 'Rajesh Patel',
       restaurant: 'Brew House Cafe',
+      initials: 'RP',
+      color: '#E63946',
     },
     {
       text: 'The stamp card feature alone has brought back 30% of our customers. Best investment ever.',
       name: 'Priya Sharma',
       restaurant: 'The Spice Kitchen',
+      initials: 'PS',
+      color: '#FF9500',
     },
     {
       text: 'Setup was done in one day. My customers love the digital menu. I love the WhatsApp orders.',
       name: 'Amit Desai',
       restaurant: 'Pizza Planet',
+      initials: 'AD',
+      color: '#34C759',
     },
   ]
 
   return (
-    <section style={{ background: T.bg, padding: '80px clamp(16px, 4vw, 40px)' }}>
+    <section style={{ background: T.bg, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -1668,6 +1866,25 @@ function TestimonialsSection() {
                   ))}
                 </div>
                 <div style={{ marginTop: 12 }}>
+                  <div style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: '50%',
+                    background: `${t.color}20`,
+                    border: `1px solid ${t.color}40`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 12,
+                  }}>
+                    <span style={{
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: t.color,
+                    }}>
+                      {t.initials}
+                    </span>
+                  </div>
                   <p style={{ fontSize: 14, fontWeight: 600, color: T.textPrimary }}>
                     {t.name}
                   </p>
@@ -1728,7 +1945,7 @@ function StatsCounterSection() {
     <section
       style={{
         background: `radial-gradient(ellipse at center, ${T.accentGlow} 0%, transparent 70%), ${T.surface}`,
-        padding: '80px clamp(16px, 4vw, 40px)',
+        padding: '80px clamp(16px, 5vw, 40px)',
       }}
     >
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -1887,7 +2104,7 @@ function FAQSection() {
   ]
 
   return (
-    <section id="faq" style={{ background: T.bg, padding: '80px clamp(16px, 4vw, 40px)' }}>
+    <section id="faq" style={{ background: T.bg, padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -1981,7 +2198,7 @@ I want to get started with MenuMate.`
   const isFormValid = form.restaurantName && form.ownerName && form.phone
 
   return (
-    <section id="get-started" style={{ background: '#0D0D0D', padding: '80px 40px' }}>
+    <section id="get-started" style={{ background: '#0D0D0D', padding: '80px clamp(16px, 5vw, 40px)' }}>
       <div style={{ maxWidth: 560, margin: '0 auto' }}>
         <AnimatedSection>
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
@@ -2013,7 +2230,7 @@ I want to get started with MenuMate.`
               background: T.surface,
               border: '1px solid rgba(255,255,255,0.08)',
               borderRadius: 20,
-              padding: 32,
+              padding: 'clamp(20px, 5vw, 32px)',
               display: 'flex',
               flexDirection: 'column',
               gap: 20,
@@ -2228,7 +2445,7 @@ function FooterSection() {
         background: '#080808',
         borderTop: '1px solid transparent',
         borderImage: 'linear-gradient(90deg, transparent, rgba(230,57,70,0.3), transparent) 1',
-        padding: '60px clamp(16px, 4vw, 40px) 32px',
+        padding: '60px clamp(16px, 5vw, 40px) 32px',
       }}
     >
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -2408,6 +2625,7 @@ export default function LandingPage() {
       <HowItWorksSection />
       <DemoSection />
       <FeaturesSection />
+      <RestaurantShowcaseSection />
       <PricingSection />
       <TestimonialsSection />
       <StatsCounterSection />

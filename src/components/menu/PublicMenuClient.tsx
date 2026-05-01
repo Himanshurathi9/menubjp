@@ -477,8 +477,9 @@ export default function PublicMenuClient({
         backdropFilter: 'blur(20px) saturate(180%)',
         WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         borderBottom: '1px solid var(--m-header-border)',
-        display: 'flex', alignItems: 'center', padding: '0 16px',
+        display: 'flex', alignItems: 'center', padding: '0 clamp(10px, 4vw, 16px)',
         maxWidth: 1200, width: '100%', margin: '0 auto',
+        overflow: 'hidden',
       }}>
         {/* Restaurant name or tab toggle */}
         {!searchOpen && (
@@ -489,17 +490,17 @@ export default function PublicMenuClient({
                   onClick={() => setActiveTab('menu')}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 5,
-                    padding: '6px 14px', borderRadius: 10,
+                    padding: '6px 10px', borderRadius: 10,
                     background: activeTab === 'menu' ? 'var(--m-pill-active-bg)' : 'var(--m-pill-bg)',
                     color: activeTab === 'menu' ? 'var(--m-pill-active-text)' : 'var(--m-pill-text)',
                     border: 'none', cursor: 'pointer',
                     fontSize: 13, fontWeight: 600,
                     transition: 'all 150ms ease',
-                    flexShrink: 0,
+                    flexShrink: 1, minWidth: 0,
                   }}
                 >
-                  <UtensilsCrossed size={14} strokeWidth={2} />
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <UtensilsCrossed size={14} strokeWidth={2} style={{ flexShrink: 0 }} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
                     {restaurant.name}
                   </span>
                 </button>
@@ -507,7 +508,7 @@ export default function PublicMenuClient({
                   onClick={() => setActiveTab('stamps')}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 5,
-                    padding: '6px 14px', borderRadius: 10,
+                    padding: '6px 10px', borderRadius: 10,
                     background: activeTab === 'stamps' ? 'var(--m-pill-active-bg)' : 'var(--m-pill-bg)',
                     color: activeTab === 'stamps' ? 'var(--m-pill-active-text)' : 'var(--m-pill-text)',
                     border: 'none', cursor: 'pointer',
@@ -553,7 +554,7 @@ export default function PublicMenuClient({
         )}
 
         {/* Right icons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, marginLeft: searchOpen ? 8 : 'auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, marginLeft: searchOpen ? 8 : 'auto' }}>
           {!searchOpen && activeTab === 'menu' && (
             <button
               className="menu-theme-btn"
@@ -697,7 +698,7 @@ export default function PublicMenuClient({
               </div>
             ) : (
               /* ── Product Grid ── */
-              <div style={{ padding: '16px 0 120px' }}>
+              <div style={{ padding: '16px 0 calc(100px + env(safe-area-inset-bottom, 0px))' }}>
                 {displayGroups.map((group, gi) => (
                   <div
                     key={group.categoryId}
@@ -834,7 +835,7 @@ export default function PublicMenuClient({
       )}
 
       {/* Bottom safe area spacer — extra padding for service bar */}
-      <div style={{ height: 'calc(100px + env(safe-area-inset-bottom, 0px))', flexShrink: 0 }} />
+      <div style={{ height: 'calc(20px + env(safe-area-inset-bottom, 0px))', flexShrink: 0 }} />
     </div>
   )
 }

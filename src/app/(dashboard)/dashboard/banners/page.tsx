@@ -372,7 +372,7 @@ export default function BannersPage() {
         className="dash-glass sticky top-0 z-40 animate-dash-section-enter animate-dash-section-1"
         style={{ padding: '20px 16px 0 16px' }}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <h1
             style={{
               fontSize: 28,
@@ -843,7 +843,7 @@ function BannerSheet({
         </div>
 
         {/* Header with X button */}
-        <div className="flex items-center justify-between px-5 pb-3 pt-1 flex-shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-5 pb-3 pt-1 flex-shrink-0">
           <div className="flex items-center gap-3">
             {mode === 'edit' ? (
               <button
@@ -892,7 +892,7 @@ function BannerSheet({
         <div className="dash-separator" />
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-5 pb-6 premium-scroll">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-5 pb-6 premium-scroll">
           <input
             ref={inputRef}
             type="file"
@@ -1041,7 +1041,7 @@ function BannerSheet({
           </div>
 
           {/* Date Range */}
-          <div className="grid grid-cols-2 gap-3" style={{ marginBottom: 16 }}>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3" style={{ marginBottom: 16 }}>
             <div>
               <label className="block" style={{ fontSize: 13, fontWeight: 500, color: 'var(--dash-text-2)', marginBottom: 6 }}>
                 Start Date <span style={{ color: 'var(--dash-text-3)' }}>(optional)</span>

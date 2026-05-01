@@ -1248,6 +1248,109 @@
   }
 }
 
+/* ─── Very small screen responsive overrides (320px–360px) ─── */
+@media (max-width: 360px) {
+  /* 1. Service Bar — tighter spacing to prevent overflow */
+  .menu-service-bar {
+    gap: 6px;
+    padding: 5px;
+    left: 10px;
+    right: 10px;
+    border-radius: 16px;
+  }
+  .menu-service-btn {
+    height: 42px;
+    min-height: 42px;
+    padding: 0 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  .menu-service-btn__icon {
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 5px !important;
+  }
+  .menu-service-btn__icon svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  .menu-fab {
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .menu-fab-badge {
+    min-width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+  .menu-fab-total {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+
+  /* 2. Cart Sheet — ensure Place Order button visible on short screens */
+  .menu-sheet {
+    max-height: 90vh;
+  }
+  .menu-sheet-order-btn {
+    height: 48px;
+    font-size: 14px;
+  }
+  .menu-sheet-item {
+    padding: 10px 16px;
+  }
+
+  /* 3. Category Pills — reduced padding for small screens */
+  .menu-pill {
+    height: 30px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+  .menu-category-bar {
+    padding: 6px 0 !important;
+  }
+
+  /* 4. Menu Cards — tighter padding in 2-column grid */
+  .menu-card-content {
+    padding: 6px 8px 8px;
+  }
+  .menu-card-name {
+    font-size: 12px;
+  }
+  .menu-card-price {
+    font-size: 13px;
+  }
+  .menu-add-btn {
+    width: 26px;
+    height: 26px;
+  }
+  .menu-qty-control {
+    height: 26px;
+  }
+
+  /* 5. Banner Slider — more compact on very small screens */
+  .menu-banner-slider {
+    aspect-ratio: 16/7;
+  }
+  .menu-banner-title {
+    font-size: 13px;
+  }
+
+  /* 6. Header — reduced spacing for 320px screens */
+  .menu-theme-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+  .menu-search-pill {
+    height: 32px;
+  }
+  .menu-search-input {
+    font-size: 13px;
+  }
+}
+
 /* ─── Desktop responsive overrides ──────────────────────────── */
 @media (min-width: 641px) {
   .menu-service-bar {

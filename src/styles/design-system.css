@@ -1656,6 +1656,26 @@ body {
   box-shadow: 0 0 8px rgba(34,197,94,0.5);
 }
 
+/* ── Dashboard Nav Responsive (320px-480px) ── */
+@media (max-width: 480px) {
+  .dash-nav-float {
+    overflow: hidden;
+    gap: 2px;
+    padding: 5px;
+  }
+  .dash-nav-item {
+    min-width: 48px;
+    padding: 6px 10px;
+    gap: 1px;
+  }
+}
+@media (max-width: 360px) {
+  .dash-nav-item {
+    min-width: 44px;
+    padding: 6px 8px;
+  }
+}
+
 /* ── Dashboard Sparkline Container ── */
 .dash-sparkline {
   width: 100%;
